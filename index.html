@@ -969,8 +969,8 @@ function batchParseText() {
   const person = document.getElementById('batch-person').value.trim();
   const textEl = document.getElementById('batch-text');
   const text = textEl ? textEl.value.trim() : '';
-  if (!person) { alert('Сначала введите имя получателя'); return; }
-  if (!text) { alert('Введите хотя бы один трек'); return; }
+  if (!person) { showToast('Сначала введите имя получателя'); return; }
+  if (!text) { showToast('Введите хотя бы один трек'); return; }
 
   const lines = text.split('\n');
   const parsed = [];
