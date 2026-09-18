@@ -1455,12 +1455,12 @@ function openPersonDetail(name) {
     '</div>';
 
   content += '<h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">📦 Перечень треков</h3>';
-  content += tracks.map(function(k, i) {
+    content += tracks.map(function(k, i) {
     const p = db[k];
-    return '<div class="track-list-item">' +
+    return '<div class="track-list-item" style="cursor:pointer;" onclick="openEditModal(\'' + escapeAttr(k) + '\')">' +
       '<div class="track-number">' + (i + 1) + '</div>' +
       '<div class="track-content">' +
-        '<div class="track-code">' + escapeHtml(k) + '</div>' +
+        '<div class="track-code">' + escapeHtml(k) + ' <span style="font-size:11px;color:var(--text-secondary);font-weight:400;">✏️ нажмите для редактирования</span></div>' +
         '<div class="track-meta">' +
           '<strong>Вес:</strong> ' + escapeHtml(p.weight || '—') + ' кг<br>' +
           '<strong>Количество:</strong> ' + escapeHtml(p.count || '—') + ' шт<br>' +
