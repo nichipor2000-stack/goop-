@@ -958,8 +958,8 @@ function savePackage() {
     if (preview) preview.style.display = 'none';
     const photoStatus = document.getElementById('photo-status');
     if (photoStatus) photoStatus.innerHTML = '';
-    alert('✅ Сохранено: ' + track);
-  } catch (e) { alert('Ошибка сохранения: ' + e.message); }
+    showToast('✅ Сохранено: ' + track);
+  } catch (e) { showToast('Ошибка сохранения: ' + e.message); }
 }
 
 // ==================== ПАКЕТНОЕ ====================
@@ -1144,7 +1144,7 @@ function openPersonDetail(name) {
   const db = loadDB();
   const allKeys = Object.keys(db);
   const tracks = allKeys.filter(function(k) { return (db[k].person || 'Без имени').trim() === name; });
-  if (tracks.length === 0) { alert('Нет треков'); return; }
+  if (tracks.length === 0) { showToast('Нет треков'); return; }
 
   let totalWeight = 0;
   let totalCount = 0;
@@ -1266,7 +1266,7 @@ function deleteTrackFromModal() {
   delete db[track];
   saveDB(db);
   closeEditModal();
-  alert('🗑 Трек удалён');
+  showToast('🗑 Трек удалён');
   const personDetailScreen = document.getElementById('screen-person-detail');
   if (personDetailScreen && !personDetailScreen.classList.contains('hidden')) {
     switchMenu('packages');
