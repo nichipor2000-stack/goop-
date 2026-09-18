@@ -556,6 +556,7 @@ function onScan(text, resultId, mode) {
       '<h3>✅ ' + escapeHtml(code) + '</h3>' +
       '<p><span class="label">Для кого</span><em>' + escapeHtml(p.person || '—') + '</em></p>' +
       '<p><span class="label">Вес</span>' + escapeHtml(p.weight || '—') + ' кг</p>' +
+      '<p><span class="label">Количество</span>' + escapeHtml(p.count || '—') + ' шт</p>' +
       '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
       '</div>';
     if (navigator.vibrate) navigator.vibrate(120);
