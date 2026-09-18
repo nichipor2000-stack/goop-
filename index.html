@@ -905,7 +905,7 @@ function generateBarcode() {
     textEl.textContent = track;
     preview.style.display = 'block';
     preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } catch(e) { alert('Ошибка: недопустимые символы'); }
+  } catch(e) { showToast('Ошибка: недопустимые символы'); }
 }
 
 function saveBarcodeImage() {
