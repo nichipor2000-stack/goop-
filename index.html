@@ -861,6 +861,7 @@ function renderPackages() {
       '<h3><span class="track-number" style="display:inline-flex;min-width:28px;height:28px;font-size:12px;">' + (i + 1) + '</span> 📦 ' + escapeHtml(k) + '</h3>' +
       '<p><span class="label">Для кого</span><em>' + escapeHtml(p.person || '—') + '</em></p>' +
       '<p><span class="label">Вес</span>' + escapeHtml(p.weight || '—') + ' кг</p>' +
+      '<p><span class="label">Количество</span>' + escapeHtml(p.count || '—') + ' шт</p>' +
       '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
       '<button class="danger" style="margin-top:8px;" onclick="delPackage(\'' + escapeAttr(k) + '\')">🗑 Удалить</button>' +
       '</div>';
