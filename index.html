@@ -1345,16 +1345,107 @@ function renderPackages() {
   const searchEl = document.getElementById('packages-search');
   const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
 
+  // ===== СНАЧАЛА СОРТИРУЕМ ПО ДАТЕ ДОБАВЛЕНИЯ (новые сверху) =====
+  keys.sort(function(a, b) {
+    const ta = (db[a] && db[a].addedAt) || 0;
+    const tb = (db[b] && db[b].addedAt) || 0;
+    return tb - ta;
+  });
+
+  // ===== ФИЛЬТР ПОИСКА =====
   if (query) {
     keys = keys.filter(function(k) {
       const p = db[k];
-      return k.toLowerCase().includes(query) ||
-        (p.person || '').toLowerCase().includes(query) ||
-        (p.desc || '').toLowerCase().includes(query) ||
-        String(p.count || '').includes(query) ||
-        String(p.weight || '').includes(query);
+      return k.toLowerCase().indexOf(query) !== -1 ||
+        (p.person || '').toLowerCase().indexOf(query) !== -1 ||
+        (p.desc || '').toLowerCase().indexOf(query) !== -1 ||
+        String(p.count || '').indexOf(query) !== -1 ||
+        String(p.weight || '').indexOf(query) !== -1;
     });
   }
+
+  // ===== СТАТИСТИКА =====
+  const statsEl = document.getElementById('packages-stats');
+  const total = keys.length;
+  let totalWeight = 0;
+  keys.forEach(function(k) { totalWeight += parseFloat(db[k].weight) || 0; });
+
+  const persons = {};
+  keys.forEach(function(k) {
+    const name = (db[k].person || 'Без имени').trim();
+    if (!persons[name]) persons[name] = { count: 0, weight: 0 };
+    persons[name].count++;
+    persons[name].weight += parseFloat(db[k].weight) || 0;
+  });
+
+  statsEl.innerHTML =
+    '<div class="stat-card"><div class="num">' + total + '</div><div class="lbl">Треков</div></div>' +
+    '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
+    '<div class="stat-card"><div class="num">' + Object.keys(persons).length + '</div><div class="lbl">Людей</div></div>';
+
+  // ===== ЛЮДИ (левая колонка) =====
+  const personsEl = document.getElementById('packages-persons');
+  if (Object.keys(persons).length === 0) {
+    personsEl.innerHTML = '<div style="font-size:11px; color:var(--text-secondary); text-align:center; padding:10px;">Нет</div>';
+  } else {
+    personsEl.innerHTML = Object.keys(persons).sort().map(function(name) {
+      const avatar = getAvatarFor(name);
+      const color = getAvatarColor(name);
+      return '<div class="person-mini" onclick="openPersonDetail(\'' + escapeAttr(name) + '\')">' +
+        '<div class="person-mini-avatar" style="background:' + color + ';">' + avatar + '</div>' +
+        '<div class="person-mini-name">' + escapeHtml(name) + '</div>' +
+        '<div class="person-mini-meta">' + persons[name].count + ' шт<br>' + persons[name].weight.toFixed(1) + ' кг</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ===== ТРЕКИ (правая колонка) =====
+  const listEl = document.getElementById('packages-list');
+  if (keys.length === 0) {
+    listEl.innerHTML = query
+      ? '<div class="empty" style="padding:30px 15px;"><span class="icon">🔍</span>Ничего не найдено</div>'
+      : '<div class="empty" style="padding:30px 15px;"><span class="icon">📭</span>Пока нет треков</div>';
+    return;
+  }
+
+  listEl.innerHTML = keys.map(function(k) {
+    const p = db[k];
+
+    // Формат даты и времени
+    let dateStr = '';
+    if (p.addedAt) {
+      const d = new Date(p.addedAt);
+      dateStr = d.toLocaleString('ru-RU', {
+        day: '2-digit', month: '2-digit', year: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    return '<div class="card clickable" onclick="openEditModal(\'' + escapeAttr(k) + '\')" style="padding:12px;">' +
+
+      // Верхняя строка: номер + дата справа
+      '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px; margin-bottom:6px;">' +
+        '<div style="font-family:monospace; font-weight:700; font-size:13px; color:var(--primary-dark); word-break:break-all; flex:1;">' + escapeHtml(k) + '</div>' +
+        (dateStr ? '<div style="font-size:10px; color:var(--text-secondary); text-align:right; white-space:nowrap; flex-shrink:0;">🕒 ' + dateStr + '</div>' : '') +
+      '</div>' +
+
+      // Для кого
+      '<div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">' +
+        '👤 <em>' + escapeHtml(p.person || '—') + '</em>' +
+      '</div>' +
+
+      // Вес и количество в одну строку
+      '<div style="display:flex; gap:10px; font-size:12px; color:var(--text-secondary); flex-wrap:wrap;">' +
+        (p.weight ? '<span>⚖️ ' + escapeHtml(p.weight) + ' кг</span>' : '') +
+        (p.count ? '<span>🔢 ' + escapeHtml(p.count) + ' шт</span>' : '') +
+      '</div>' +
+
+      // Описание
+      (p.desc ? '<div style="font-size:12px; color:var(--text); margin-top:6px; padding-top:6px; border-top:1px solid var(--border);">' + escapeHtml(p.desc) + '</div>' : '') +
+
+      '</div>';
+  }).join('');
+}
 
   const statsEl = document.getElementById('packages-stats');
   const personsEl = document.getElementById('packages-persons');
