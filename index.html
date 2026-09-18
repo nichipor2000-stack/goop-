@@ -1035,13 +1035,13 @@ function renderBatchPreview() {
 }
 
 function batchSaveAll() {
-  if (batchItems.length === 0) { alert('Сначала разберите текст'); return; }
+  if (batchItems.length === 0) { showToast('Сначала разберите текст'); return; }
   const db = loadDB();
   batchItems.forEach(function(it) {
     db[it.track] = { person: it.person, weight: it.weight, count: it.count, desc: it.desc, addedAt: Date.now() };
   });
   saveDB(db);
-  alert('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
+  showToast('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
   batchItems = [];
   renderBatchPreview();
   const textEl = document.getElementById('batch-text');
