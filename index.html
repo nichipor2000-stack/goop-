@@ -817,14 +817,35 @@ function batchSaveAll() {
 // ==================== ПОСЫЛКИ ====================
 function renderPackages() {
   const db = loadDB();
-  const keys = Object.keys(db);
+  let keys = Object.keys(db);
+
+  // Фильтр поиска
+  const searchEl = document.getElementById('packages-search');
+  const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
+
+  if (query) {
+    keys = keys.filter(function(k) {
+      const p = db[k];
+      const inTrack = k.toLowerCase().includes(query);
+      const inPerson = (p.person || '').toLowerCase().includes(query);
+      const inDesc = (p.desc || '').toLowerCase().includes(query);
+      const inCount = String(p.count || '').includes(query);
+      const inWeight = String(p.weight || '').includes(query);
+      return inTrack || inPerson || inDesc || inCount || inWeight;
+    });
+  }
+
   const statsEl = document.getElementById('packages-stats');
   const personsEl = document.getElementById('packages-persons');
   const listEl = document.getElementById('packages-list');
 
   const total = keys.length;
   let totalWeight = 0;
-  keys.forEach(function(k) { totalWeight += parseFloat(db[k].weight) || 0; });
+  let totalItems = 0;
+  keys.forEach(function(k) {
+    totalWeight += parseFloat(db[k].weight) || 0;
+    totalItems += parseInt(db[k].count) || 0;
+  });
 
   const persons = {};
   keys.forEach(function(k) {
@@ -839,23 +860,37 @@ function renderPackages() {
     '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
     '<div class="stat-card"><div class="num">' + Object.keys(persons).length + '</div><div class="lbl">Людей</div></div>';
 
-  if (Object.keys(persons).length === 0) {
+  // Если идёт поиск — скрываем блок "По именам" (чтобы не отвлекал)
+  const personsTitle = document.querySelector('#screen-packages h3');
+  if (query) {
     personsEl.innerHTML = '';
+    if (personsTitle) personsTitle.style.display = 'none';
   } else {
-    personsEl.innerHTML = Object.keys(persons).sort().map(function(name) {
-      return '<div class="card clickable" style="background:linear-gradient(to right,var(--primary-light),white);" onclick="openPersonDetail(\'' + escapeAttr(name) + '\')">' +
-        '<h3>👤 ' + escapeHtml(name) + ' <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">➜</span></h3>' +
-        '<p><span class="label">Треков</span>' + persons[name].count + '</p>' +
-        '<p><span class="label">Общий вес</span>' + persons[name].weight.toFixed(1) + ' кг</p>' +
-        '<p style="font-size:12px;color:var(--primary);margin-top:8px;">Нажмите для подробностей</p>' +
-        '</div>';
-    }).join('');
+    if (personsTitle) personsTitle.style.display = 'block';
+    if (Object.keys(persons).length === 0) {
+      personsEl.innerHTML = '';
+    } else {
+      personsEl.innerHTML = Object.keys(persons).sort().map(function(name) {
+        return '<div class="card clickable" style="background:linear-gradient(to right,var(--primary-light),white);" onclick="openPersonDetail(\'' + escapeAttr(name) + '\')">' +
+          '<h3>👤 ' + escapeHtml(name) + ' <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">➜</span></h3>' +
+          '<p><span class="label">Треков</span>' + persons[name].count + '</p>' +
+          '<p><span class="label">Общий вес</span>' + persons[name].weight.toFixed(1) + ' кг</p>' +
+          '<p style="font-size:12px;color:var(--primary);margin-top:8px;">Нажмите для подробностей</p>' +
+          '</div>';
+      }).join('');
+    }
   }
 
   if (keys.length === 0) {
-    listEl.innerHTML = '<div class="empty"><span class="icon">📭</span>Пока нет треков</div>';
+    listEl.innerHTML = query
+      ? '<div class="empty"><span class="icon">🔍</span>Ничего не найдено по запросу «' + escapeHtml(query) + '»</div>'
+      : '<div class="empty"><span class="icon">📭</span>Пока нет треков</div>';
     return;
   }
+
+  // Сортируем найденные треки по алфавиту, чтобы было удобнее
+  keys.sort();
+
   listEl.innerHTML = keys.map(function(k, i) {
     const p = db[k];
     return '<div class="card">' +
@@ -867,14 +902,6 @@ function renderPackages() {
       '<button class="danger" style="margin-top:8px;" onclick="delPackage(\'' + escapeAttr(k) + '\')">🗑 Удалить</button>' +
       '</div>';
   }).join('');
-}
-
-function delPackage(key) {
-  if (!confirm('Удалить ' + key + '?')) return;
-  const db = loadDB();
-  delete db[key];
-  saveDB(db);
-  renderPackages();
 }
 
 // ==================== ДЕТАЛИ ЧЕЛОВЕКА ====================
