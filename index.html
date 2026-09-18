@@ -858,7 +858,11 @@ function openPersonDetail(name) {
   if (tracks.length === 0) { alert('Нет треков'); return; }
 
   let totalWeight = 0;
-  tracks.forEach(function(k) { totalWeight += parseFloat(db[k].weight) || 0; });
+  let totalCount = 0;
+  tracks.forEach(function(k) {
+    totalWeight += parseFloat(db[k].weight) || 0;
+    totalCount += parseInt(db[k].count) || 0;
+  });
   const initial = name.charAt(0).toUpperCase();
 
   let content = '<div class="person-detail-header">' +
@@ -870,7 +874,7 @@ function openPersonDetail(name) {
   content += '<div class="person-detail-stats">' +
     '<div class="stat-card"><div class="num">' + tracks.length + '</div><div class="lbl">Треков</div></div>' +
     '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
-    '<div class="stat-card"><div class="num">' + tracks.length + '</div><div class="lbl">Товаров</div></div>' +
+    '<div class="stat-card"><div class="num">' + totalCount + '</div><div class="lbl">Товаров</div></div>' +
     '</div>';
 
   content += '<h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">📦 Перечень треков</h3>';
@@ -882,6 +886,7 @@ function openPersonDetail(name) {
         '<div class="track-code">' + escapeHtml(k) + '</div>' +
         '<div class="track-meta">' +
           '<strong>Вес:</strong> ' + escapeHtml(p.weight || '—') + ' кг<br>' +
+          '<strong>Количество:</strong> ' + escapeHtml(p.count || '—') + ' шт<br>' +
           '<strong>Что в треке:</strong> ' + escapeHtml(p.desc || '—') +
         '</div>' +
       '</div>' +
