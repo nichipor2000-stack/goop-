@@ -474,13 +474,23 @@
     <button class="danger hidden" id="clear-history-btn" onclick="clearHistory()" style="margin-top:12px;">🗑 Очистить историю</button>
   </div>
 
-  <div id="screen-packages" class="screen hidden">
+   <div id="screen-packages" class="screen hidden">
     <div class="stats" id="packages-stats"></div>
     <input id="packages-search" placeholder="🔍 Поиск по треку, имени или описанию..." autocomplete="off" oninput="renderPackages()" style="margin-bottom:14px;">
-    <h3 id="persons-title" style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">👥 По именам (нажмите для деталей)</h3>
-    <div id="packages-persons"></div>
-    <h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">📦 Все треки</h3>
-    <div id="packages-list"></div>
+
+    <div style="display:flex; gap:12px; align-items:flex-start;">
+      <!-- ЛЕВАЯ КОЛОНКА: ЛЮДИ -->
+      <div style="width:100px; flex-shrink:0;">
+        <div style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; text-align:center;">👥 Люди</div>
+        <div id="packages-persons"></div>
+      </div>
+
+      <!-- ПРАВАЯ КОЛОНКА: ТРЕКИ -->
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">📦 Все треки</div>
+        <div id="packages-list"></div>
+      </div>
+    </div>
   </div>
 
   <div id="screen-person-detail" class="screen hidden">
