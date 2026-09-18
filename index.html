@@ -1409,8 +1409,8 @@ function openPersonDetail(name) {
     const avatar = getAvatarFor(name);
   const avatarColor = getAvatarColor(name);
 
-  let content = '<div class="person-detail-header">' +
-    '<div class="person-detail-avatar">' + escapeHtml(initial) + '</div>' +
+    let content = '<div class="person-detail-header">' +
+    '<div class="person-detail-avatar" style="background:' + avatarColor + ';font-size:44px;">' + avatar + '</div>' +
     '<div class="person-detail-name">' + escapeHtml(name) + '</div>' +
     '<div class="person-detail-sub">Все треки этого человека</div>' +
     '</div>';
