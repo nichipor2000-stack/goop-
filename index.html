@@ -1365,6 +1365,69 @@ function clearConverter() {
   document.getElementById('result-sub').textContent = 'Введите сумму';
 }
 
+  // ==================== ЗВУКИ ====================
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      return null;
+    }
+  }
+  // Возобновляем контекст (некоторые браузеры блокируют до первого клика)
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playTone(frequency, duration, type, volume) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+
+  try {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    oscillator.type = type || 'sine';
+    oscillator.frequency.value = frequency;
+
+    gainNode.gain.setValueAtTime(volume || 0.15, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + duration);
+  } catch (e) {
+    console.log('Sound error:', e);
+  }
+}
+
+function playSuccessSound() {
+  // Приятный восходящий "пик"
+  playTone(880, 0.12, 'sine', 0.2);
+  setTimeout(function() { playTone(1320, 0.15, 'sine', 0.15); }, 80);
+}
+
+function playErrorSound() {
+  // Низкий короткий "бум"
+  playTone(220, 0.25, 'sawtooth', 0.15);
+}
+
+function playSaveSound() {
+  // Мягкий "динь"
+  playTone(660, 0.15, 'sine', 0.18);
+  setTimeout(function() { playTone(990, 0.2, 'sine', 0.12); }, 70);
+}
+
+function playNotificationSound() {
+  // Лёгкий "пик" для уведомлений
+  playTone(1200, 0.08, 'sine', 0.12);
+}
   // ==================== УВЕДОМЛЕНИЯ ====================
 function showToast(message, type) {
   type = type || 'info';
