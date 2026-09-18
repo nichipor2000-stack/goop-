@@ -1278,7 +1278,7 @@ function deleteTrackFromModal() {
 // ==================== ГОЛОС ====================
 function startVoiceAdd() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Браузер не поддерживает голосовой ввод'); return; }
+  if (!SR) { showToast('Браузер не поддерживает голосовой ввод'); return; }
   const rec = new SR();
   rec.lang = 'ru-RU';
   rec.onresult = function(e) {
@@ -1303,7 +1303,7 @@ function openCurrencyPicker(slot) {
   const input = prompt('Введите код валюты:\n\n' + options, slot === 1 ? currency1.code : currency2.code);
   if (!input) return;
   const found = CURRENCIES.find(function(c) { return c.code.toUpperCase() === input.trim().toUpperCase(); });
-  if (!found) { alert('Валюта не найдена'); return; }
+  if (!found) { showToast('Валюта не найдена'); return; }
   if (slot === 1) { currency1 = found; } else { currency2 = found; }
   updateCurrencyUI();
   convertCurrency(slot);
