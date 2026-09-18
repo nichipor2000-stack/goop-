@@ -1535,6 +1535,47 @@ function escapeAttr(s) {
 }
 
 // ==================== СТАРТ ====================
+  // ==================== АВАТАРКИ ПО ИМЕНИ ====================
+const AVATAR_EMOJIS = [
+  '👩🏻', '🧑🏻', '👨🏼', '👧', '🧒', '👦', '👶', '🧓🏻',
+  '👩🏼', '🧑🏽', '👨🏽', '👩🏽', '🧑🏿', '👨🏿',
+  '🍎', '🍇', '🍓', '🍌', '🍉', '🍒', '🍑', '🍊', '🍋', '🥝',
+  '🦊', '🐼', '🐻', '🐰', '🐨', '🦁', '🐯', '🐮', '🐷', '🐸',
+  '🐵', '🐔', '🦄', '🐧', '🦋', '🐝', '🐢', '🐙'
+];
+
+function getAvatarFor(name) {
+  if (!name) return '👤';
+  let hash = 0;
+  const str = String(name).trim().toLowerCase();
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const idx = Math.abs(hash) % AVATAR_EMOJIS.length;
+  return AVATAR_EMOJIS[idx];
+}
+
+function getAvatarColor(name) {
+  const colors = [
+    'linear-gradient(135deg, #ec4899, #f43f5e)',
+    'linear-gradient(135deg, #8b5cf6, #6366f1)',
+    'linear-gradient(135deg, #06b6d4, #0ea5e9)',
+    'linear-gradient(135deg, #f59e0b, #f97316)',
+    'linear-gradient(135deg, #10b981, #059669)',
+    'linear-gradient(135deg, #ef4444, #dc2626)',
+    'linear-gradient(135deg, #a855f7, #7c3aed)',
+    'linear-gradient(135deg, #14b8a6, #0891b2)'
+  ];
+  if (!name) return colors[0];
+  let hash = 0;
+  const str = String(name).trim().toLowerCase();
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
 // ==================== ТЁМНАЯ ТЕМА ====================
 function applyTheme(theme) {
   if (theme === 'dark') {
