@@ -896,7 +896,7 @@ function scanPhoto(event, targetId) {
 // ==================== ШТРИХ-КОД ====================
 function generateBarcode() {
   const track = document.getElementById('in-track').value.trim().toUpperCase();
-  if (!track) { alert('Введите трек-номер'); return; }
+  if (!track) { showToast('Введите трек-номер'); return; }
   const preview = document.getElementById('barcode-preview');
   const svg = document.getElementById('barcode-svg');
   const textEl = document.getElementById('barcode-text');
