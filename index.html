@@ -129,6 +129,19 @@
 
   .footer { text-align: center; padding: 16px; color: var(--text-secondary); font-size: 11px; font-weight: 600; letter-spacing: 1px; }
   .footer strong { color: var(--primary-dark); }
+    /* ============ ОБРЕЗКА ФОТО ============ */
+  #crop-modal {
+    display: none;
+  }
+  #crop-modal.active {
+    display: flex !important;
+  }
+  #crop-frame {
+    z-index: 2;
+  }
+  #crop-image {
+    z-index: 1;
+  }
   .hidden { display: none !important; }
 </style>
 </head>
