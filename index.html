@@ -742,12 +742,14 @@ function batchAddTrack() {
   const track = document.getElementById('batch-track').value.trim().toUpperCase();
   const weight = document.getElementById('batch-weight').value.trim();
   const desc = document.getElementById('batch-desc').value.trim();
+  const count = document.getElementById('batch-count').value.trim();
   if (!person) { alert('Введите имя получателя'); return; }
   if (!track) { alert('Введите трек-номер'); return; }
-  batchItems.push({ person: person, track: track, weight: weight, desc: desc });
+  batchItems.push({ person: person, track: track, weight: weight, desc: desc, count: count });
   document.getElementById('batch-track').value = '';
   document.getElementById('batch-weight').value = '';
   document.getElementById('batch-desc').value = '';
+  document.getElementById('batch-count').value = '';
   renderBatchPreview();
 }
 
