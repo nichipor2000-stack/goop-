@@ -576,9 +576,10 @@ function quickSave(track) {
   const person = document.getElementById('quick-person').value.trim();
   const weight = document.getElementById('quick-weight').value.trim();
   const desc = document.getElementById('quick-desc').value.trim();
+  const count = document.getElementById('quick-count').value.trim();
   if (!person) { alert('Введите имя: для кого этот трек'); return; }
   const db = loadDB();
-  db[track] = { person: person, weight: weight, desc: desc, addedAt: Date.now() };
+  db[track] = { person: person, weight: weight, desc: desc, count: count, addedAt: Date.now() };
   saveDB(db);
   const el = document.getElementById('scan-result-scan');
   if (el) {
@@ -586,6 +587,7 @@ function quickSave(track) {
       '<h3>✅ Сохранено: ' + escapeHtml(track) + '</h3>' +
       '<p><span class="label">Для кого</span><em>' + escapeHtml(person) + '</em></p>' +
       '<p><span class="label">Вес</span>' + escapeHtml(weight || '—') + ' кг</p>' +
+      '<p><span class="label">Количество</span>' + escapeHtml(count || '—') + ' шт</p>' +
       '<p><span class="label">Что в треке</span>' + escapeHtml(desc || '—') + '</p>' +
       '</div>';
   }
