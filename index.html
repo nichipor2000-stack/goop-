@@ -774,7 +774,10 @@ function openCropModal(img, targetId, event) {
     cropImg.style.left = cropState.offsetX + 'px';
     cropImg.style.top = cropState.offsetY + 'px';
 
-    initCropGestures();
+    const manualInput = document.getElementById('crop-manual-input');
+if (manualInput) manualInput.value = '';
+
+initCropGestures();
   }, 100);
 }
 
