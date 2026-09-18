@@ -744,9 +744,12 @@ function onScan(text, resultId, mode) {
   const now = Date.now();
   if (text === lastScan.code && now - lastScan.time < 2500) return;
   lastScan = { code: text, time: now };
-  const code = text.toUpperCase().trim();
+    const code = text.toUpperCase().trim();
   const el = document.getElementById(resultId);
   if (!el) return;
+
+  // 🔊 Звук успешного сканирования (код считался камерой)
+  playScanSound();
 
   if (mode === 'add') {
     document.getElementById('in-track').value = code;
