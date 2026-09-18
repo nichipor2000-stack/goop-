@@ -1406,7 +1406,8 @@ function openPersonDetail(name) {
     totalWeight += parseFloat(db[k].weight) || 0;
     totalCount += parseInt(db[k].count) || 0;
   });
-  const initial = name.charAt(0).toUpperCase();
+    const avatar = getAvatarFor(name);
+  const avatarColor = getAvatarColor(name);
 
   let content = '<div class="person-detail-header">' +
     '<div class="person-detail-avatar">' + escapeHtml(initial) + '</div>' +
