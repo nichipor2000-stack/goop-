@@ -130,24 +130,32 @@
   .footer { text-align: center; padding: 16px; color: var(--text-secondary); font-size: 11px; font-weight: 600; letter-spacing: 1px; }
   .footer strong { color: var(--primary-dark); }
 
-  /* ============ КОМПАКТНЫЕ КАРТОЧКИ ЛЮДЕЙ (левая колонка) ============ */
-  .person-mini {
-    background: var(--card);
-    border-radius: 12px;
-    padding: 8px 6px;
-    margin-bottom: 8px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    transition: transform 0.15s, box-shadow 0.15s;
-    border: 1.5px solid transparent;
-  }
+  .person-mini { background: var(--card); border-radius: 12px; padding: 8px 6px; margin-bottom: 8px; text-align: center; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.15s; border: 1.5px solid transparent; }
   .person-mini:active { transform: scale(0.96); }
   .person-mini-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 4px; }
   .person-mini-name { font-size: 11px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
   .person-mini-meta { font-size: 9px; color: var(--text-secondary); line-height: 1.3; }
 
-  /* ============ ТЁМНАЯ ТЕМА ============ */
+  /* Уведомления */
+  #toast-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 90%; max-width: 400px; }
+  .toast { background: white; border-radius: 14px; padding: 14px 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: var(--text); pointer-events: auto; animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); border-left: 5px solid var(--primary); cursor: pointer; position: relative; overflow: hidden; }
+  .toast.success { border-left-color: var(--success); }
+  .toast.error { border-left-color: var(--danger); }
+  .toast.info { border-left-color: var(--primary); }
+  .toast.warning { border-left-color: #f59e0b; }
+  .toast .toast-icon { font-size: 22px; flex-shrink: 0; }
+  .toast .toast-text { flex: 1; line-height: 1.4; word-break: break-word; }
+  .toast.fade-out { animation: toastOut 0.3s ease forwards; }
+  .toast::after { content: ''; position: absolute; bottom: 0; left: 0; height: 3px; background: var(--primary); width: 100%; animation: toastProgress 2.5s linear forwards; }
+  .toast.success::after { background: var(--success); }
+  .toast.error::after { background: var(--danger); }
+  .toast.warning::after { background: #f59e0b; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+  @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
+  body.dark .toast { background: #1e293b; color: #f1f5f9; }
+
+  /* Тёмная тема */
   body.dark {
     --primary: #3b82f6; --primary-dark: #60a5fa; --primary-light: #1e3a5f;
     --success-light: #14532d; --danger-light: #7f1d1d;
@@ -173,79 +181,6 @@
   body.dark .empty { background: #1e293b; color: #94a3b8; }
   body.dark .sidebar { background: #1e293b; }
 
-    /* ============ УВЕДОМЛЕНИЯ ============ */
-  #toast-container {
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 999999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-    width: 90%;
-    max-width: 400px;
-  }
-  .toast {
-    background: white;
-    border-radius: 14px;
-    padding: 14px 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    pointer-events: auto;
-    animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border-left: 5px solid var(--primary);
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .toast.success { border-left-color: var(--success); }
-  .toast.error { border-left-color: var(--danger); }
-  .toast.info { border-left-color: var(--primary); }
-  .toast.warning { border-left-color: #f59e0b; }
-  .toast .toast-icon { font-size: 22px; flex-shrink: 0; }
-  .toast .toast-text { flex: 1; line-height: 1.4; word-break: break-word; }
-  .toast.fade-out { animation: toastOut 0.3s ease forwards; }
-
-  .toast::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    background: var(--primary);
-    width: 100%;
-    animation: toastProgress 2.5s linear forwards;
-  }
-  .toast.success::after { background: var(--success); }
-  .toast.error::after { background: var(--danger); }
-  .toast.warning::after { background: #f59e0b; }
-
-  @keyframes toastIn {
-    from { opacity: 0; transform: translateY(-30px) scale(0.9); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  @keyframes toastOut {
-    from { opacity: 1; transform: translateY(0) scale(1); }
-    to { opacity: 0; transform: translateY(-20px) scale(0.95); }
-  }
-  @keyframes toastProgress {
-    from { width: 100%; }
-    to { width: 0%; }
-  }
-
-  /* Тёмная тема для уведомлений */
-  body.dark .toast {
-    background: #1e293b;
-    color: #f1f5f9;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -364,7 +299,6 @@
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Укажите, для кого все треки ниже</p>
       <input id="batch-person" placeholder="Например: Вика" autocomplete="off" style="font-style: italic; margin-bottom:0;">
     </div>
-
     <div class="card">
       <h3>📦 Список треков (по одному в строке)</h3>
       <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.6;">
@@ -377,7 +311,6 @@
       <textarea id="batch-text" placeholder="RU123456789 кроссовки 2 1.2&#10;RU987654321 заколки 100 0.5&#10;RU555666777 футболка 1 0.3" style="min-height:150px;font-family:'Courier New',monospace;font-size:14px;resize:vertical;"></textarea>
       <button class="success" onclick="batchParseText()">🔍 Разобрать и показать список</button>
     </div>
-
     <div id="batch-preview"></div>
     <button class="danger hidden" id="batch-save-btn" onclick="batchSaveAll()">💾 Сохранить все треки в базу</button>
   </div>
@@ -428,7 +361,6 @@
   <div id="screen-packages" class="screen hidden">
     <div class="stats" id="packages-stats"></div>
     <input id="packages-search" placeholder="🔍 Поиск по треку, имени или описанию..." autocomplete="off" oninput="renderPackages()" style="margin-bottom:14px;">
-
     <div style="display:flex; gap:12px; align-items:flex-start;">
       <div style="width:100px; flex-shrink:0;">
         <div style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; text-align:center;">👥 Люди</div>
@@ -448,11 +380,10 @@
 
 </main>
 
-  <!-- ============ КОНТЕЙНЕР ДЛЯ УВЕДОМЛЕНИЙ ============ -->
-<div id="toast-container"></div>
 <div class="footer" id="footer" style="display:none;">Автор: <strong>NN</strong></div>
 
-<!-- ============ МОДАЛКА РЕДАКТИРОВАНИЯ ТРЕКА ============ -->
+<div id="toast-container"></div>
+
 <div id="edit-modal" style="position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:99997;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);">
   <div style="background:white;border-radius:20px;padding:24px 20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -460,15 +391,15 @@
       <button onclick="closeEditModal()" style="background:transparent;border:none;color:var(--text-secondary);font-size:22px;cursor:pointer;padding:4px 10px;margin:0;box-shadow:none;width:auto;">✕</button>
     </div>
     <input type="hidden" id="edit-track">
-    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Трек-номер</label>
+    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Трек-номер</label>
     <input id="edit-track-display" disabled style="background:#f1f5f9;font-family:monospace;font-weight:700;color:var(--text);">
-    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;margin-top:8px;">Для кого</label>
+    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;margin-top:8px;">Для кого</label>
     <input id="edit-person" placeholder="Для кого" style="font-style:italic;">
-    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;margin-top:8px;">Вес (кг)</label>
+    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;margin-top:8px;">Вес (кг)</label>
     <input id="edit-weight" type="number" step="0.01" inputmode="decimal" placeholder="0.0">
-    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;margin-top:8px;">Количество товаров</label>
+    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;margin-top:8px;">Количество товаров</label>
     <input id="edit-count" type="number" step="1" inputmode="numeric" placeholder="0">
-    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;margin-top:8px;">Что в треке</label>
+    <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;margin-top:8px;">Что в треке</label>
     <input id="edit-desc" placeholder="Описание">
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button onclick="closeEditModal()" class="ghost" style="flex:1;">Отмена</button>
@@ -660,6 +591,64 @@ function loadTheme() {
   applyTheme(saved);
 }
 
+// ==================== ЗВУК СКАНИРОВАНИЯ ====================
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      return null;
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playScanSound() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 1200;
+    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.12);
+  } catch (e) {
+    console.log('Sound error:', e);
+  }
+}
+
+// ==================== УВЕДОМЛЕНИЯ ====================
+function showToast(message, type) {
+  type = type || 'info';
+  const container = document.getElementById('toast-container');
+  if (!container) { console.log('Toast:', message); return; }
+  const icons = { 'success': '✅', 'error': '❌', 'warning': '⚠️', 'info': 'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML = '<div class="toast-icon">' + (icons[type] || 'ℹ️') + '</div><div class="toast-text">' + escapeHtml(message) + '</div>';
+  toast.onclick = function() { dismissToast(toast); };
+  container.appendChild(toast);
+  setTimeout(function() { dismissToast(toast); }, 2500);
+}
+
+function dismissToast(toast) {
+  if (!toast || !toast.parentNode) return;
+  toast.classList.add('fade-out');
+  setTimeout(function() {
+    if (toast.parentNode) toast.parentNode.removeChild(toast);
+  }, 300);
+}
+
 // ==================== МЕНЮ ====================
 function switchMenu(menu) {
   document.querySelectorAll('.menu-item').forEach(function(m) { m.classList.remove('active'); });
@@ -744,17 +733,16 @@ function onScan(text, resultId, mode) {
   const now = Date.now();
   if (text === lastScan.code && now - lastScan.time < 2500) return;
   lastScan = { code: text, time: now };
-    const code = text.toUpperCase().trim();
+  const code = text.toUpperCase().trim();
   const el = document.getElementById(resultId);
   if (!el) return;
 
-  // 🔊 Звук успешного сканирования (код считался камерой)
+  // 🔊 Звук успешного сканирования
   playScanSound();
 
   if (mode === 'add') {
     document.getElementById('in-track').value = code;
     el.innerHTML = '<div class="card found"><h3>✅ Распознано</h3><p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p><p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Перейдите в «Добавить вручную»</p></div>';
-    if (navigator.vibrate) navigator.vibrate(120);
     addToHistory(code);
     return;
   }
@@ -763,8 +751,7 @@ function onScan(text, resultId, mode) {
   const p = db[code];
   addToHistory(code);
 
-   if (p) {
-    playSuccessSound();
+  if (p) {
     el.innerHTML = '<div class="card found">' +
       '<h3>✅ ' + escapeHtml(code) + '</h3>' +
       '<p><span class="label">Для кого</span><em>' + escapeHtml(p.person || '—') + '</em></p>' +
@@ -772,9 +759,7 @@ function onScan(text, resultId, mode) {
       '<p><span class="label">Количество</span>' + escapeHtml(p.count || '—') + ' шт</p>' +
       '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
       '</div>';
-    if (navigator.vibrate) navigator.vibrate(120);
-    } else {
-    playErrorSound();
+  } else {
     el.innerHTML = '<div class="card notfound">' +
       '<h3>❓ ' + escapeHtml(code) + '</h3>' +
       '<p>Такого трека нет в базе. Заполните и сохраните:</p>' +
@@ -784,7 +769,6 @@ function onScan(text, resultId, mode) {
       '<input id="quick-desc" placeholder="Что в треке">' +
       '<button class="success" onclick="quickSave(\'' + escapeAttr(code) + '\')">💾 Сохранить этот трек</button>' +
       '</div>';
-    if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
   }
 }
 
@@ -797,7 +781,7 @@ function quickSave(track) {
   const weight = weightEl ? weightEl.value.trim() : '';
   const count = countEl ? countEl.value.trim() : '';
   const desc = descEl ? descEl.value.trim() : '';
-  if (!person) { showToast('Введите имя: для кого этот трек'); return; }
+  if (!person) { showToast('Введите имя', 'error'); return; }
   try {
     const db = loadDB();
     db[track] = { person: person, weight: weight, count: count, desc: desc, addedAt: Date.now() };
@@ -812,8 +796,8 @@ function quickSave(track) {
         '<p><span class="label">Что в треке</span>' + escapeHtml(desc || '—') + '</p>' +
         '</div>';
     }
-    if (navigator.vibrate) navigator.vibrate(120);
-  } catch (e) { showToast('Ошибка: ' + e.message); }
+    showToast('Сохранено: ' + track, 'success');
+  } catch (e) { showToast('Ошибка: ' + e.message, 'error'); }
 }
 
 function prefillAdd(track) {
@@ -901,7 +885,7 @@ function scanPhoto(event, targetId) {
 // ==================== ШТРИХ-КОД ====================
 function generateBarcode() {
   const track = document.getElementById('in-track').value.trim().toUpperCase();
-  if (!track) { showToast('Введите трек-номер'); return; }
+  if (!track) { showToast('Введите трек-номер', 'error'); return; }
   const preview = document.getElementById('barcode-preview');
   const svg = document.getElementById('barcode-svg');
   const textEl = document.getElementById('barcode-text');
@@ -910,7 +894,7 @@ function generateBarcode() {
     textEl.textContent = track;
     preview.style.display = 'block';
     preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } catch(e) { showToast('Ошибка: недопустимые символы'); }
+  } catch(e) { showToast('Ошибка: недопустимые символы', 'error'); }
 }
 
 function saveBarcodeImage() {
@@ -949,7 +933,7 @@ function savePackage() {
   const weight = weightEl ? weightEl.value.trim() : '';
   const count = countEl ? countEl.value.trim() : '';
   const desc = descEl ? descEl.value.trim() : '';
-  if (!track) { showToast('Введите трек-номер'); return; }
+  if (!track) { showToast('Введите трек-номер', 'error'); return; }
   try {
     const db = loadDB();
     db[track] = { person: person, weight: weight, count: count, desc: desc, addedAt: Date.now() };
@@ -963,8 +947,8 @@ function savePackage() {
     if (preview) preview.style.display = 'none';
     const photoStatus = document.getElementById('photo-status');
     if (photoStatus) photoStatus.innerHTML = '';
-    showToast('✅ Сохранено: ' + track);
-  } catch (e) { showToast('Ошибка сохранения: ' + e.message); }
+    showToast('Сохранено: ' + track, 'success');
+  } catch (e) { showToast('Ошибка сохранения: ' + e.message, 'error'); }
 }
 
 // ==================== ПАКЕТНОЕ ====================
@@ -974,13 +958,11 @@ function batchParseText() {
   const person = document.getElementById('batch-person').value.trim();
   const textEl = document.getElementById('batch-text');
   const text = textEl ? textEl.value.trim() : '';
-  if (!person) { showToast('Сначала введите имя получателя'); return; }
-  if (!text) { showToast('Введите хотя бы один трек'); return; }
-
+  if (!person) { showToast('Сначала введите имя получателя', 'error'); return; }
+  if (!text) { showToast('Введите хотя бы один трек', 'error'); return; }
   const lines = text.split('\n');
   const parsed = [];
   const errors = [];
-
   lines.forEach(function(line, idx) {
     const trimmed = line.trim();
     if (!trimmed) return;
@@ -993,12 +975,10 @@ function batchParseText() {
     let count = '';
     let weight = '';
     let descParts = parts.slice(1);
-
     const lastPart = descParts[descParts.length - 1];
     const secondLast = descParts.length > 1 ? descParts[descParts.length - 2] : '';
     const isLastNumber = /^\d+(\.\d+)?$/.test(lastPart);
     const isSecondLastNumber = /^\d+(\.\d+)?$/.test(secondLast);
-
     if (isLastNumber && isSecondLastNumber) {
       count = secondLast;
       weight = lastPart;
@@ -1007,13 +987,11 @@ function batchParseText() {
       weight = lastPart;
       descParts = descParts.slice(0, -1);
     }
-
     const desc = descParts.join(' ').trim();
     parsed.push({ person: person, track: track, desc: desc, weight: weight, count: count });
   });
-
-  if (errors.length > 0) showToast('Ошибки:\n\n' + errors.join('\n'));
-  if (parsed.length === 0) { showToast('Не удалось разобрать треки'); return; }
+  if (errors.length > 0) showToast('Ошибки: ' + errors.length + ' строк. Проверьте текст.', 'warning');
+  if (parsed.length === 0) { showToast('Не удалось разобрать треки', 'error'); return; }
   batchItems = parsed;
   renderBatchPreview();
 }
@@ -1040,13 +1018,13 @@ function renderBatchPreview() {
 }
 
 function batchSaveAll() {
-  if (batchItems.length === 0) { showToast('Сначала разберите текст'); return; }
+  if (batchItems.length === 0) { showToast('Сначала разберите текст', 'error'); return; }
   const db = loadDB();
   batchItems.forEach(function(it) {
     db[it.track] = { person: it.person, weight: it.weight, count: it.count, desc: it.desc, addedAt: Date.now() };
   });
   saveDB(db);
-  showToast('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
+  showToast('Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person, 'success');
   batchItems = [];
   renderBatchPreview();
   const textEl = document.getElementById('batch-text');
@@ -1060,7 +1038,6 @@ function renderPackages() {
   const searchEl = document.getElementById('packages-search');
   const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
 
-  // Сортировка по времени добавления (новые сверху)
   keys.sort(function(a, b) {
     const ta = (db[a] && db[a].addedAt) || 0;
     const tb = (db[b] && db[b].addedAt) || 0;
@@ -1099,7 +1076,6 @@ function renderPackages() {
     '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
     '<div class="stat-card"><div class="num">' + Object.keys(persons).length + '</div><div class="lbl">Людей</div></div>';
 
-  // ЛЮДИ (левая колонка)
   if (Object.keys(persons).length === 0) {
     personsEl.innerHTML = '<div style="font-size:11px; color:var(--text-secondary); text-align:center; padding:10px;">Нет</div>';
   } else {
@@ -1114,7 +1090,6 @@ function renderPackages() {
     }).join('');
   }
 
-  // ТРЕКИ (правая колонка)
   if (keys.length === 0) {
     listEl.innerHTML = query
       ? '<div class="empty" style="padding:30px 15px;"><span class="icon">🔍</span>Ничего не найдено</div>'
@@ -1149,7 +1124,7 @@ function openPersonDetail(name) {
   const db = loadDB();
   const allKeys = Object.keys(db);
   const tracks = allKeys.filter(function(k) { return (db[k].person || 'Без имени').trim() === name; });
-  if (tracks.length === 0) { showToast('Нет треков'); return; }
+  if (tracks.length === 0) { showToast('Нет треков', 'warning'); return; }
 
   let totalWeight = 0;
   let totalCount = 0;
@@ -1174,7 +1149,6 @@ function openPersonDetail(name) {
 
   content += '<h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">📦 Перечень треков</h3>';
 
-  // Сортируем треки по времени добавления (новые сверху)
   tracks.sort(function(a, b) {
     const ta = (db[a] && db[a].addedAt) || 0;
     const tb = (db[b] && db[b].addedAt) || 0;
@@ -1212,10 +1186,8 @@ let editingOriginalPerson = '';
 function openEditModal(track) {
   const db = loadDB();
   const p = db[track];
-  if (!p) { showToast('Трек не найден'); return; }
-
+  if (!p) { showToast('Трек не найден', 'error'); return; }
   editingOriginalPerson = (p.person || '').trim();
-
   document.getElementById('edit-track').value = track;
   document.getElementById('edit-track-display').value = track;
   document.getElementById('edit-person').value = p.person || '';
@@ -1236,7 +1208,6 @@ function saveEditTrack() {
   const weight = document.getElementById('edit-weight').value.trim();
   const count = document.getElementById('edit-count').value.trim();
   const desc = document.getElementById('edit-desc').value.trim();
-
   const db = loadDB();
   db[track] = {
     person: person,
@@ -1248,8 +1219,7 @@ function saveEditTrack() {
   };
   saveDB(db);
   closeEditModal();
-  showToast('✅ Трек обновлён');
-
+  showToast('Трек обновлён', 'success');
   const personDetailScreen = document.getElementById('screen-person-detail');
   const packagesScreen = document.getElementById('screen-packages');
   if (personDetailScreen && !personDetailScreen.classList.contains('hidden')) {
@@ -1271,7 +1241,7 @@ function deleteTrackFromModal() {
   delete db[track];
   saveDB(db);
   closeEditModal();
-  showToast('🗑 Трек удалён');
+  showToast('Трек удалён', 'success');
   const personDetailScreen = document.getElementById('screen-person-detail');
   if (personDetailScreen && !personDetailScreen.classList.contains('hidden')) {
     switchMenu('packages');
@@ -1283,7 +1253,7 @@ function deleteTrackFromModal() {
 // ==================== ГОЛОС ====================
 function startVoiceAdd() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { showToast('Браузер не поддерживает голосовой ввод'); return; }
+  if (!SR) { showToast('Браузер не поддерживает голосовой ввод', 'warning'); return; }
   const rec = new SR();
   rec.lang = 'ru-RU';
   rec.onresult = function(e) {
@@ -1308,7 +1278,7 @@ function openCurrencyPicker(slot) {
   const input = prompt('Введите код валюты:\n\n' + options, slot === 1 ? currency1.code : currency2.code);
   if (!input) return;
   const found = CURRENCIES.find(function(c) { return c.code.toUpperCase() === input.trim().toUpperCase(); });
-  if (!found) { showToast('Валюта не найдена'); return; }
+  if (!found) { showToast('Валюта не найдена', 'error'); return; }
   if (slot === 1) { currency1 = found; } else { currency2 = found; }
   updateCurrencyUI();
   convertCurrency(slot);
@@ -1370,146 +1340,6 @@ function clearConverter() {
   document.getElementById('result-sub').textContent = 'Введите сумму';
 }
 
-  // ==================== ЗВУКИ ====================
-let audioCtx = null;
-
-function getAudioCtx() {
-  if (!audioCtx) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) {
-      return null;
-    }
-  }
-  // Возобновляем контекст (некоторые браузеры блокируют до первого клика)
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  return audioCtx;
-}
-
-function playTone(frequency, duration, type, volume) {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-
-  try {
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.type = type || 'sine';
-    oscillator.frequency.value = frequency;
-
-    gainNode.gain.setValueAtTime(volume || 0.15, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + duration);
-  } catch (e) {
-    console.log('Sound error:', e);
-  }
-}
-
-function playSuccessSound() {
-  // Приятный восходящий "пик"
-  playTone(880, 0.12, 'sine', 0.2);
-  setTimeout(function() { playTone(1320, 0.15, 'sine', 0.15); }, 80);
-}
-
-function playErrorSound() {
-  // Низкий короткий "бум"
-  playTone(220, 0.25, 'sawtooth', 0.15);
-}
-
-function playSaveSound() {
-  // Мягкий "динь"
-  playTone(660, 0.15, 'sine', 0.18);
-  setTimeout(function() { playTone(990, 0.2, 'sine', 0.12); }, 70);
-}
-
-function playNotificationSound() {
-  // Лёгкий "пик" для уведомлений
-  playTone(1200, 0.08, 'sine', 0.12);
-}
-  // ==================== ЗВУК СКАНИРОВАНИЯ ====================
-let audioCtx = null;
-
-function getAudioCtx() {
-  if (!audioCtx) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) {
-      return null;
-    }
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  return audioCtx;
-}
-
-function playScanSound() {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  try {
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.value = 1200;
-    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.12);
-  } catch (e) {
-    console.log('Sound error:', e);
-  }
-}
-  // ==================== УВЕДОМЛЕНИЯ ====================
-function showToast(message, type) {
-  type = type || 'info';
-  const container = document.getElementById('toast-container');
-  if (!container) {
-    console.log('Toast:', message);
-    return;
-  }
-
-  const icons = {
-    'success': '✅',
-    'error': '❌',
-    'warning': '⚠️',
-    'info': 'ℹ️'
-  };
-
-  const toast = document.createElement('div');
-  toast.className = 'toast ' + type;
-  toast.innerHTML =
-    '<div class="toast-icon">' + (icons[type] || 'ℹ️') + '</div>' +
-    '<div class="toast-text">' + escapeHtml(message) + '</div>';
-
-  // Закрытие по нажатию
-  toast.onclick = function() {
-    dismissToast(toast);
-  };
-
-  container.appendChild(toast);
-
-  // Автоматическое скрытие через 2.5 секунды
-  setTimeout(function() {
-    dismissToast(toast);
-  }, 2500);
-}
-
-function dismissToast(toast) {
-  if (!toast || !toast.parentNode) return;
-  toast.classList.add('fade-out');
-  setTimeout(function() {
-    if (toast.parentNode) toast.parentNode.removeChild(toast);
-  }, 300);
-}
 // ==================== УТИЛИТЫ ====================
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, function(c) {
