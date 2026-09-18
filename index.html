@@ -880,7 +880,7 @@ function initCropGestures() {
 }
 
 function closeCropModal() {
-  document.getElementById('crop-modal').style.display = 'none';
+  document.getElementById('crop-modal').classList.remove('active');
   if (cropState.event) cropState.event.target.value = '';
   cropState.img = null;
 }
