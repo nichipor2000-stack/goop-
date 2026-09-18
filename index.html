@@ -21,7 +21,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 20px; overflow-x: hidden; }
 
-  /* ВХОД/РЕГИСТРАЦИЯ */
   .welcome-screen { position: fixed; inset: 0; background: linear-gradient(160deg, #1e40af, #2563eb, #3b82f6); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .welcome-card { background: white; border-radius: 24px; padding: 28px 22px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
   .welcome-logo { font-size: 60px; margin-bottom: 12px; }
@@ -33,7 +32,6 @@
   .welcome-error { background: var(--danger-light); color: var(--danger); font-size: 13px; font-weight: 600; padding: 10px 14px; border-radius: 10px; margin-top: 8px; text-align: left; }
   .welcome-note { font-size: 11px; color: var(--text-secondary); margin-top: 16px; }
 
-  /* ПРИВЕТСТВИЕ */
   .greet-screen { position: fixed; inset: 0; background: linear-gradient(160deg, #1e40af, #2563eb, #3b82f6); z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .greet-card { background: white; border-radius: 24px; padding: 40px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
   .greet-emoji { font-size: 70px; margin-bottom: 16px; }
@@ -41,7 +39,6 @@
   .greet-name { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 20px; }
   .greet-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
 
-  /* ШАПКА */
   .app-header { background: linear-gradient(135deg, #1e40af, #2563eb, #3b82f6); color: white; padding: 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3); }
   .menu-btn, .logout-btn { background: rgba(255,255,255,0.15); border: none; color: white; width: 44px; height: 44px; border-radius: 12px; font-size: 20px; cursor: pointer; flex-shrink: 0; }
   .menu-btn:active, .logout-btn:active { background: rgba(255,255,255,0.35); }
@@ -49,7 +46,6 @@
   .header-title h1 { font-size: 18px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .header-title p { font-size: 12px; opacity: 0.85; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* БОКОВОЕ МЕНЮ */
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
   .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
   .sidebar { position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw; height: 100vh; background: var(--card); z-index: 201; transform: translateX(-100%); transition: transform 0.3s; box-shadow: 4px 0 24px rgba(15, 23, 42, 0.15); display: flex; flex-direction: column; }
@@ -63,7 +59,6 @@
   .menu-item .menu-icon { font-size: 22px; width: 28px; text-align: center; }
   .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-secondary); text-align: center; }
 
-  /* КОНТЕНТ */
   .main-content { padding: 16px; }
   .card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
   .card h3 { font-size: 16px; margin-bottom: 10px; color: var(--primary-dark); word-break: break-all; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -74,9 +69,9 @@
   .card.info { border-left: 5px solid var(--primary); }
   .card.clickable { cursor: pointer; }
 
-  input, button, select { width: 100%; padding: 14px 16px; border-radius: 12px; font-size: 15px; border: 1.5px solid var(--border); margin-bottom: 10px; font-family: inherit; background: var(--card); color: var(--text); }
-  input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-  input::placeholder { color: #94a3b8; }
+  input, button, select, textarea { width: 100%; padding: 14px 16px; border-radius: 12px; font-size: 15px; border: 1.5px solid var(--border); margin-bottom: 10px; font-family: inherit; background: var(--card); color: var(--text); }
+  input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  input::placeholder, textarea::placeholder { color: #94a3b8; }
   button { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px; }
   button:active { transform: scale(0.97); }
   button.danger { background: linear-gradient(135deg, #dc2626, #ef4444); }
@@ -139,7 +134,6 @@
 </head>
 <body>
 
-<!-- РЕГИСТРАЦИЯ / ВХОД -->
 <div class="welcome-screen" id="welcome-screen">
   <div class="welcome-card">
     <div class="welcome-logo">📦</div>
@@ -165,7 +159,6 @@
   </div>
 </div>
 
-<!-- ПРИВЕТСТВИЕ -->
 <div class="greet-screen" id="greet-screen" style="display:none;">
   <div class="greet-card">
     <div class="greet-emoji">🎉</div>
@@ -176,7 +169,6 @@
   </div>
 </div>
 
-<!-- ШАПКА -->
 <header class="app-header" id="app-header" style="display:none;">
   <button class="menu-btn" onclick="openSidebar()">☰</button>
   <div class="header-title">
@@ -186,7 +178,6 @@
   <button class="logout-btn" onclick="logout()">🚪</button>
 </header>
 
-<!-- БОКОВОЕ МЕНЮ -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
@@ -205,7 +196,6 @@
   <div class="sidebar-footer">Автор: <strong>NN</strong></div>
 </aside>
 
-<!-- КОНТЕНТ -->
 <main class="main-content" id="main-content" style="display:none;">
 
   <div id="screen-scan" class="screen">
@@ -232,7 +222,7 @@
     <div id="add-scan-result" style="margin-top:12px;"></div>
   </div>
 
-    <div id="screen-add-manual" class="screen hidden">
+  <div id="screen-add-manual" class="screen hidden">
     <input id="in-track" placeholder="Трек-номер (RU123456789)" autocomplete="off">
     <div style="display:flex; gap:8px;">
       <input id="in-person" placeholder="Для кого" autocomplete="off" style="font-style: italic;">
@@ -250,25 +240,23 @@
     <button onclick="savePackage()">💾 Сохранить в базу</button>
   </div>
 
-   <div id="screen-add-batch" class="screen hidden">
+  <div id="screen-add-batch" class="screen hidden">
     <div class="card">
       <h3>👤 Имя получателя</h3>
-      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">
-        Укажите, для кого все треки ниже
-      </p>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Укажите, для кого все треки ниже</p>
       <input id="batch-person" placeholder="Например: Вика" autocomplete="off" style="font-style: italic; margin-bottom:0;">
     </div>
 
     <div class="card">
       <h3>📦 Список треков (по одному в строке)</h3>
-           <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.6;">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.6;">
         Формат: <strong>ТРЕК ОПИСАНИЕ КОЛИЧЕСТВО ВЕС</strong><br>
-        Пример:<br>
+        Примеры:<br>
         <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:11px;">RU123 кроссовки 2 1.2</code><br>
         <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:11px;">RU456 заколки 100 0.5</code><br>
         <span style="font-size:11px;">(можно писать только вес, без количества)</span>
       </p>
-            <textarea id="batch-text" placeholder="RU123456789 кроссовки 2 1.2&#10;RU987654321 заколки 100 0.5&#10;RU555666777 футболка 1 0.3" ...
+      <textarea id="batch-text" placeholder="RU123456789 кроссовки 2 1.2&#10;RU987654321 заколки 100 0.5&#10;RU555666777 футболка 1 0.3" style="min-height:150px;font-family:'Courier New',monospace;font-size:14px;resize:vertical;"></textarea>
       <button class="success" onclick="batchParseText()">🔍 Разобрать и показать список</button>
     </div>
 
@@ -322,7 +310,7 @@
   <div id="screen-packages" class="screen hidden">
     <div class="stats" id="packages-stats"></div>
     <input id="packages-search" placeholder="🔍 Поиск по треку, имени или описанию..." autocomplete="off" oninput="renderPackages()" style="margin-bottom:14px;">
-    <h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">👥 По именам (нажмите для деталей)</h3>
+    <h3 id="persons-title" style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">👥 По именам (нажмите для деталей)</h3>
     <div id="packages-persons"></div>
     <h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;">📦 Все треки</h3>
     <div id="packages-list"></div>
@@ -585,25 +573,38 @@ function onScan(text, resultId, mode) {
 }
 
 function quickSave(track) {
-  const person = document.getElementById('quick-person').value.trim();
-  const weight = document.getElementById('quick-weight').value.trim();
-  const desc = document.getElementById('quick-desc').value.trim();
-  const count = document.getElementById('quick-count').value.trim();
+  const personEl = document.getElementById('quick-person');
+  const weightEl = document.getElementById('quick-weight');
+  const countEl = document.getElementById('quick-count');
+  const descEl = document.getElementById('quick-desc');
+
+  const person = personEl ? personEl.value.trim() : '';
+  const weight = weightEl ? weightEl.value.trim() : '';
+  const count = countEl ? countEl.value.trim() : '';
+  const desc = descEl ? descEl.value.trim() : '';
+
   if (!person) { alert('Введите имя: для кого этот трек'); return; }
-  const db = loadDB();
-  db[track] = { person: person, weight: weight, desc: desc, count: count, addedAt: Date.now() };
-  saveDB(db);
-  const el = document.getElementById('scan-result-scan');
-  if (el) {
-    el.innerHTML = '<div class="card found">' +
-      '<h3>✅ Сохранено: ' + escapeHtml(track) + '</h3>' +
-      '<p><span class="label">Для кого</span><em>' + escapeHtml(person) + '</em></p>' +
-      '<p><span class="label">Вес</span>' + escapeHtml(weight || '—') + ' кг</p>' +
-      '<p><span class="label">Количество</span>' + escapeHtml(count || '—') + ' шт</p>' +
-      '<p><span class="label">Что в треке</span>' + escapeHtml(desc || '—') + '</p>' +
-      '</div>';
+
+  try {
+    const db = loadDB();
+    db[track] = { person: person, weight: weight, count: count, desc: desc, addedAt: Date.now() };
+    saveDB(db);
+
+    const el = document.getElementById('scan-result-scan');
+    if (el) {
+      el.innerHTML = '<div class="card found">' +
+        '<h3>✅ Сохранено: ' + escapeHtml(track) + '</h3>' +
+        '<p><span class="label">Для кого</span><em>' + escapeHtml(person) + '</em></p>' +
+        '<p><span class="label">Вес</span>' + escapeHtml(weight || '—') + ' кг</p>' +
+        '<p><span class="label">Количество</span>' + escapeHtml(count || '—') + ' шт</p>' +
+        '<p><span class="label">Что в треке</span>' + escapeHtml(desc || '—') + '</p>' +
+        '</div>';
+    }
+    if (navigator.vibrate) navigator.vibrate(120);
+  } catch (e) {
+    alert('Ошибка: ' + e.message);
+    console.error(e);
   }
-  if (navigator.vibrate) navigator.vibrate(120);
 }
 
 function prefillAdd(track) {
@@ -745,33 +746,23 @@ function savePackage() {
 
   try {
     const db = loadDB();
-    db[track] = {
-      person: person,
-      weight: weight,
-      count: count,
-      desc: desc,
-      addedAt: Date.now()
-    };
+    db[track] = { person: person, weight: weight, count: count, desc: desc, addedAt: Date.now() };
     saveDB(db);
-
     if (trackEl) trackEl.value = '';
     if (personEl) personEl.value = '';
     if (weightEl) weightEl.value = '';
     if (countEl) countEl.value = '';
     if (descEl) descEl.value = '';
-
     const preview = document.getElementById('barcode-preview');
     if (preview) preview.style.display = 'none';
-
     const photoStatus = document.getElementById('photo-status');
     if (photoStatus) photoStatus.innerHTML = '';
-
     alert('✅ Сохранено: ' + track);
   } catch (e) {
     alert('Ошибка сохранения: ' + e.message);
-    console.error(e);
   }
 }
+
 // ==================== ПАКЕТНОЕ ====================
 let batchItems = [];
 
@@ -781,7 +772,7 @@ function batchParseText() {
   const text = textEl ? textEl.value.trim() : '';
 
   if (!person) { alert('Сначала введите имя получателя'); return; }
-  if (!text) { alert('Введите хотя бы один трек в поле выше'); return; }
+  if (!text) { alert('Введите хотя бы один трек'); return; }
 
   const lines = text.split('\n');
   const parsed = [];
@@ -790,14 +781,11 @@ function batchParseText() {
   lines.forEach(function(line, idx) {
     const trimmed = line.trim();
     if (!trimmed) return;
-
     const parts = trimmed.split(/\s+/);
-
     if (parts.length < 2) {
-      errors.push('Строка ' + (idx + 1) + ': слишком мало данных — «' + trimmed + '»');
+      errors.push('Строка ' + (idx + 1) + ': мало данных — «' + trimmed + '»');
       return;
     }
-
     const track = parts[0].toUpperCase();
     let count = '';
     let weight = '';
@@ -805,41 +793,25 @@ function batchParseText() {
 
     const lastPart = descParts[descParts.length - 1];
     const secondLast = descParts.length > 1 ? descParts[descParts.length - 2] : '';
-
     const isLastNumber = /^\d+(\.\d+)?$/.test(lastPart);
     const isSecondLastNumber = /^\d+(\.\d+)?$/.test(secondLast);
 
-    // НОВЫЙ ФОРМАТ: ТРЕК ОПИСАНИЕ КОЛИЧЕСТВО ВЕС
+    // ФОРМАТ: ТРЕК ОПИСАНИЕ КОЛИЧЕСТВО ВЕС
     if (isLastNumber && isSecondLastNumber) {
-      // Два числа в конце: предпоследнее — количество, последнее — вес
       count = secondLast;
       weight = lastPart;
       descParts = descParts.slice(0, -2);
     } else if (isLastNumber) {
-      // Одно число в конце — считаем, что это вес (описание + вес)
       weight = lastPart;
       descParts = descParts.slice(0, -1);
     }
 
     const desc = descParts.join(' ').trim();
-
-    parsed.push({
-      person: person,
-      track: track,
-      desc: desc,
-      weight: weight,
-      count: count
-    });
+    parsed.push({ person: person, track: track, desc: desc, weight: weight, count: count });
   });
 
-  if (errors.length > 0) {
-    alert('Ошибки в строках:\n\n' + errors.join('\n'));
-  }
-
-  if (parsed.length === 0) {
-    alert('Не удалось разобрать ни одного трека. Проверьте формат.');
-    return;
-  }
+  if (errors.length > 0) alert('Ошибки:\n\n' + errors.join('\n'));
+  if (parsed.length === 0) { alert('Не удалось разобрать треки'); return; }
 
   batchItems = parsed;
   renderBatchPreview();
@@ -849,17 +821,9 @@ function renderBatchPreview() {
   const el = document.getElementById('batch-preview');
   const btn = document.getElementById('batch-save-btn');
   if (!el || !btn) return;
-
-  if (batchItems.length === 0) {
-    el.innerHTML = '';
-    btn.classList.add('hidden');
-    return;
-  }
-
+  if (batchItems.length === 0) { el.innerHTML = ''; btn.classList.add('hidden'); return; }
   btn.classList.remove('hidden');
-
-  el.innerHTML = '<div class="card"><h3>📋 Проверьте данные (' + batchItems.length + ' треков)</h3>' +
-    '<p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Если что-то неверно — исправьте текст выше и нажмите «Разобрать» снова.</p>' +
+  el.innerHTML = '<div class="card"><h3>📋 Проверьте данные (' + batchItems.length + ')</h3>' +
     batchItems.map(function(it, i) {
       return '<div style="border-bottom:1px solid var(--border);padding:10px 0;">' +
         '<span class="track-number" style="display:inline-flex;min-width:24px;height:24px;font-size:11px;margin-right:6px;">' + (i + 1) + '</span> ' +
@@ -867,8 +831,8 @@ function renderBatchPreview() {
         '<span style="font-size:12px;color:var(--text-secondary);">' +
           '<em>' + escapeHtml(it.person) + '</em>' +
           ' · ' + (it.desc ? escapeHtml(it.desc) : '<em>без описания</em>') +
-          ' · ' + (it.weight ? escapeHtml(it.weight) + ' кг' : '<em>вес ?</em>') +
           ' · ' + (it.count ? escapeHtml(it.count) + ' шт' : '<em>кол-во ?</em>') +
+          ' · ' + (it.weight ? escapeHtml(it.weight) + ' кг' : '<em>вес ?</em>') +
         '</span>' +
         '</div>';
     }).join('') + '</div>';
@@ -876,27 +840,14 @@ function renderBatchPreview() {
 
 function batchSaveAll() {
   if (batchItems.length === 0) { alert('Сначала разберите текст'); return; }
-
   const db = loadDB();
-  let added = 0;
-
   batchItems.forEach(function(it) {
-    db[it.track] = {
-      person: it.person,
-      weight: it.weight,
-      count: it.count,
-      desc: it.desc,
-      addedAt: Date.now()
-    };
-    added++;
+    db[it.track] = { person: it.person, weight: it.weight, count: it.count, desc: it.desc, addedAt: Date.now() };
   });
-
   saveDB(db);
-  alert('✅ Сохранено ' + added + ' треков для ' + batchItems[0].person);
-
+  alert('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
   batchItems = [];
   renderBatchPreview();
-
   const textEl = document.getElementById('batch-text');
   if (textEl) textEl.value = '';
 }
@@ -905,26 +856,24 @@ function batchSaveAll() {
 function renderPackages() {
   const db = loadDB();
   let keys = Object.keys(db);
-
-  // Фильтр поиска
   const searchEl = document.getElementById('packages-search');
   const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
 
   if (query) {
     keys = keys.filter(function(k) {
       const p = db[k];
-      const inTrack = k.toLowerCase().includes(query);
-      const inPerson = (p.person || '').toLowerCase().includes(query);
-      const inDesc = (p.desc || '').toLowerCase().includes(query);
-      const inCount = String(p.count || '').includes(query);
-      const inWeight = String(p.weight || '').includes(query);
-      return inTrack || inPerson || inDesc || inCount || inWeight;
+      return k.toLowerCase().includes(query) ||
+        (p.person || '').toLowerCase().includes(query) ||
+        (p.desc || '').toLowerCase().includes(query) ||
+        String(p.count || '').includes(query) ||
+        String(p.weight || '').includes(query);
     });
   }
 
   const statsEl = document.getElementById('packages-stats');
   const personsEl = document.getElementById('packages-persons');
   const listEl = document.getElementById('packages-list');
+  const personsTitle = document.getElementById('persons-title');
 
   const total = keys.length;
   let totalWeight = 0;
@@ -947,8 +896,6 @@ function renderPackages() {
     '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
     '<div class="stat-card"><div class="num">' + Object.keys(persons).length + '</div><div class="lbl">Людей</div></div>';
 
-  // Если идёт поиск — скрываем блок "По именам" (чтобы не отвлекал)
-  const personsTitle = document.querySelector('#screen-packages h3');
   if (query) {
     personsEl.innerHTML = '';
     if (personsTitle) personsTitle.style.display = 'none';
@@ -975,9 +922,7 @@ function renderPackages() {
     return;
   }
 
-  // Сортируем найденные треки по алфавиту, чтобы было удобнее
   keys.sort();
-
   listEl.innerHTML = keys.map(function(k, i) {
     const p = db[k];
     return '<div class="card">' +
@@ -989,6 +934,14 @@ function renderPackages() {
       '<button class="danger" style="margin-top:8px;" onclick="delPackage(\'' + escapeAttr(k) + '\')">🗑 Удалить</button>' +
       '</div>';
   }).join('');
+}
+
+function delPackage(key) {
+  if (!confirm('Удалить ' + key + '?')) return;
+  const db = loadDB();
+  delete db[key];
+  saveDB(db);
+  renderPackages();
 }
 
 // ==================== ДЕТАЛИ ЧЕЛОВЕКА ====================
@@ -1051,8 +1004,8 @@ function startVoiceAdd() {
 }
 
 // ==================== КОНВЕРТЕР ====================
-let currency1 = { code: 'BYN', flag: '🇧🇾', name: 'BYN' };
-let currency2 = { code: 'CNY', flag: '🇨🇳', name: 'CNY' };
+let currency1 = { code: 'BYN', flag: '🇧🇾' };
+let currency2 = { code: 'CNY', flag: '🇨🇳' };
 let lastEdited = 1;
 
 const CURRENCIES = [
