@@ -1007,8 +1007,8 @@ function batchParseText() {
     parsed.push({ person: person, track: track, desc: desc, weight: weight, count: count });
   });
 
-  if (errors.length > 0) alert('Ошибки:\n\n' + errors.join('\n'));
-  if (parsed.length === 0) { alert('Не удалось разобрать треки'); return; }
+  if (errors.length > 0) showToast('Ошибки:\n\n' + errors.join('\n'));
+  if (parsed.length === 0) { showToast('Не удалось разобрать треки'); return; }
   batchItems = parsed;
   renderBatchPreview();
 }
