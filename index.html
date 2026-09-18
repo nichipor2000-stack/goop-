@@ -689,12 +689,15 @@ function onScan(text, resultId, mode) {
       '<p><span class="label">Вес</span>' + escapeHtml(p.weight || '—') + ' кг</p>' +
       '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
       '</div>';
-    if (navigator.vibrate) navigator.vibrate(120);
-  } else {
+    if (navigator.vibrate) navigator.vibrate(
+      } else {
     el.innerHTML = '<div class="card notfound">' +
       '<h3>❓ ' + escapeHtml(code) + '</h3>' +
-      '<p>Такого трека нет в базе</p>' +
-      '<button class="success" style="margin-top:12px;" onclick="prefillAdd(\'' + escapeAttr(code) + '\')">➕ Добавить</button>' +
+      '<p>Такого трека нет в базе. Заполните поля и сохраните:</p>' +
+      '<input id="quick-person" placeholder="Для кого" style="font-style: italic; margin-top:10px;">' +
+      '<input id="quick-weight" placeholder="Вес в кг" type="number" step="0.01" inputmode="decimal">' +
+      '<input id="quick-desc" placeholder="Что в треке">' +
+      '<button class="success" onclick="quickSave(\'' + escapeAttr(code) + '\')">💾 Сохранить этот трек</button>' +
       '</div>';
     if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
   }
@@ -703,6 +706,29 @@ function onScan(text, resultId, mode) {
 function prefillAdd(track) {
   document.getElementById('in-track').value = track;
   switchMenu('add-manual');
+}
+  function quickSave(track) {
+  const person = document.getElementById('quick-person').value.trim();
+  const weight = document.getElementById('quick-weight').value.trim();
+  const desc = document.getElementById('quick-desc').value.trim();
+
+  if (!person) { alert('Введите имя: для кого этот трек'); return; }
+
+  const db = loadDB();
+  db[track] = { person: person, weight: weight, desc: desc, addedAt: Date.now() };
+  saveDB(db);
+
+  // Показываем карточку "сохранено"
+  const el = document.getElementById('scan-result-scan');
+  if (el) {
+    el.innerHTML = '<div class="card found">' +
+      '<h3>✅ Сохранено: ' + escapeHtml(track) + '</h3>' +
+      '<p><span class="label">Для кого</span><em>' + escapeHtml(person) + '</em></p>' +
+      '<p><span class="label">Вес</span>' + escapeHtml(weight || '—') + ' кг</p>' +
+      '<p><span class="label">Что в треке</span>' + escapeHtml(desc || '—') + '</p>' +
+      '</div>';
+  }
+  if (navigator.vibrate) navigator.vibrate(120);
 }
 
 // ============================================
