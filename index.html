@@ -808,7 +808,7 @@ function quickSave(track) {
         '</div>';
     }
     if (navigator.vibrate) navigator.vibrate(120);
-  } catch (e) { alert('Ошибка: ' + e.message); }
+  } catch (e) { showToast('Ошибка: ' + e.message); }
 }
 
 function prefillAdd(track) {
