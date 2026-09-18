@@ -920,7 +920,27 @@ function applyCrop() {
     cropState.img = null;
   }, 'image/png', 1.0);
 }
+function applyManualFromCrop() {
+  const input = document.getElementById('crop-manual-input');
+  const code = input ? input.value.trim().toUpperCase() : '';
+  if (!code) { alert('Введите трек-номер в поле выше'); return; }
 
+  document.getElementById('in-track').value = code;
+
+  const statusEl = document.getElementById(cropState.targetId);
+  if (statusEl) {
+    statusEl.innerHTML = '<div class="card found" style="margin-top:12px;">' +
+      '<h3>✅ Введено вручную</h3>' +
+      '<p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p>' +
+      '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Перейдите в «Добавить вручную»</p>' +
+      '</div>';
+  }
+
+  if (cropState.event) cropState.event.target.value = '';
+  document.getElementById('crop-modal').classList.remove('active');
+  cropState.img = null;
+}
+  
 function processCroppedFile(file, targetId, event) {
   const statusEl = document.getElementById(targetId);
   statusEl.innerHTML = '<div class="card info" style="margin-top:12px;">⏳ Распознаю штрих-код...</div>';
