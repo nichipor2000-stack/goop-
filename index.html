@@ -721,10 +721,8 @@ function scanPhoto(event, targetId) {
 }
 
 function openCropModal(img, targetId, event) {
-  const modal = document.getElementById('crop-modal');
-  modal.style.display = 'flex';
-  modal.style.flexDirection = 'column';
-
+    const modal = document.getElementById('crop-modal');
+  modal.classList.add('active');
   const container = document.getElementById('crop-container');
   const cropImg = document.getElementById('crop-image');
 
