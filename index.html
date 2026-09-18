@@ -760,7 +760,8 @@ function onScan(text, resultId, mode) {
   const p = db[code];
   addToHistory(code);
 
-  if (p) {
+   if (p) {
+    playSuccessSound();
     el.innerHTML = '<div class="card found">' +
       '<h3>✅ ' + escapeHtml(code) + '</h3>' +
       '<p><span class="label">Для кого</span><em>' + escapeHtml(p.person || '—') + '</em></p>' +
