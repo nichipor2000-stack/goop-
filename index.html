@@ -1430,6 +1430,41 @@ function playNotificationSound() {
   // Лёгкий "пик" для уведомлений
   playTone(1200, 0.08, 'sine', 0.12);
 }
+  // ==================== ЗВУК СКАНИРОВАНИЯ ====================
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      return null;
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playScanSound() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 1200;
+    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.12);
+  } catch (e) {
+    console.log('Sound error:', e);
+  }
+}
   // ==================== УВЕДОМЛЕНИЯ ====================
 function showToast(message, type) {
   type = type || 'info';
