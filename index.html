@@ -1365,6 +1365,48 @@ function clearConverter() {
   document.getElementById('result-sub').textContent = 'Введите сумму';
 }
 
+  // ==================== УВЕДОМЛЕНИЯ ====================
+function showToast(message, type) {
+  type = type || 'info';
+  const container = document.getElementById('toast-container');
+  if (!container) {
+    console.log('Toast:', message);
+    return;
+  }
+
+  const icons = {
+    'success': '✅',
+    'error': '❌',
+    'warning': '⚠️',
+    'info': 'ℹ️'
+  };
+
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML =
+    '<div class="toast-icon">' + (icons[type] || 'ℹ️') + '</div>' +
+    '<div class="toast-text">' + escapeHtml(message) + '</div>';
+
+  // Закрытие по нажатию
+  toast.onclick = function() {
+    dismissToast(toast);
+  };
+
+  container.appendChild(toast);
+
+  // Автоматическое скрытие через 2.5 секунды
+  setTimeout(function() {
+    dismissToast(toast);
+  }, 2500);
+}
+
+function dismissToast(toast) {
+  if (!toast || !toast.parentNode) return;
+  toast.classList.add('fade-out');
+  setTimeout(function() {
+    if (toast.parentNode) toast.parentNode.removeChild(toast);
+  }, 300);
+}
 // ==================== УТИЛИТЫ ====================
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, function(c) {
