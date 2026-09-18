@@ -808,11 +808,14 @@ function batchParseText() {
     const isLastNumber = /^\d+(\.\d+)?$/.test(lastPart);
     const isSecondLastNumber = /^\d+(\.\d+)?$/.test(secondLast);
 
+    // НОВЫЙ ФОРМАТ: ТРЕК ОПИСАНИЕ КОЛИЧЕСТВО ВЕС
     if (isLastNumber && isSecondLastNumber) {
-      count = lastPart;
-      weight = secondLast;
+      // Два числа в конце: предпоследнее — количество, последнее — вес
+      count = secondLast;
+      weight = lastPart;
       descParts = descParts.slice(0, -2);
     } else if (isLastNumber) {
+      // Одно число в конце — считаем, что это вес (описание + вес)
       weight = lastPart;
       descParts = descParts.slice(0, -1);
     }
