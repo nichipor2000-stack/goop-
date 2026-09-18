@@ -720,25 +720,49 @@ function saveBarcodeImage() {
 
 // ==================== СОХРАНЕНИЕ ====================
 function savePackage() {
-  const track = document.getElementById('in-track').value.trim().toUpperCase();
-  const person = document.getElementById('in-person').value.trim();
-  const weight = document.getElementById('in-weight').value.trim();
-  const desc = document.getElementById('in-desc').value.trim();
-  const count = document.getElementById('in-count').value.trim();
-  if (!track) { alert('Введите трек-номер'); return; }
-  const db = loadDB();
-  db[track] = { person: person, weight: weight, desc: desc, count: count, addedAt: Date.now() };
-  saveDB(db);
-  document.getElementById('in-track').value = '';
-  document.getElementById('in-person').value = '';
-  document.getElementById('in-weight').value = '';
-  document.getElementById('in-desc').value = '';
-  document.getElementById('in-count').value = '';
-  document.getElementById('barcode-preview').style.display = 'none';
-  document.getElementById('photo-status').innerHTML = '';
-  alert('✅ Сохранено: ' + track);
-}
+  const trackEl = document.getElementById('in-track');
+  const personEl = document.getElementById('in-person');
+  const weightEl = document.getElementById('in-weight');
+  const countEl = document.getElementById('in-count');
+  const descEl = document.getElementById('in-desc');
 
+  const track = trackEl ? trackEl.value.trim().toUpperCase() : '';
+  const person = personEl ? personEl.value.trim() : '';
+  const weight = weightEl ? weightEl.value.trim() : '';
+  const count = countEl ? countEl.value.trim() : '';
+  const desc = descEl ? descEl.value.trim() : '';
+
+  if (!track) { alert('Введите трек-номер'); return; }
+
+  try {
+    const db = loadDB();
+    db[track] = {
+      person: person,
+      weight: weight,
+      count: count,
+      desc: desc,
+      addedAt: Date.now()
+    };
+    saveDB(db);
+
+    if (trackEl) trackEl.value = '';
+    if (personEl) personEl.value = '';
+    if (weightEl) weightEl.value = '';
+    if (countEl) countEl.value = '';
+    if (descEl) descEl.value = '';
+
+    const preview = document.getElementById('barcode-preview');
+    if (preview) preview.style.display = 'none';
+
+    const photoStatus = document.getElementById('photo-status');
+    if (photoStatus) photoStatus.innerHTML = '';
+
+    alert('✅ Сохранено: ' + track);
+  } catch (e) {
+    alert('Ошибка сохранения: ' + e.message);
+    console.error(e);
+  }
+}
 // ==================== ПАКЕТНОЕ ====================
 let batchItems = [];
 
