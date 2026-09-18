@@ -682,12 +682,231 @@ function clearHistory() {
 }
 
 // ==================== ФОТО ====================
+// ==================== ОБРЕЗКА ФОТО ====================
+let cropState = {
+  img: null,
+  offsetX: 0,
+  offsetY: 0,
+  scale: 1,
+  minScale: 1,
+  targetId: null,
+  event: null
+};
+
 function scanPhoto(event, targetId) {
   const file = event.target.files[0];
   if (!file) return;
 
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      openCropModal(img, targetId, event);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function openCropModal(img, targetId, event) {
+  const modal = document.getElementById('crop-modal');
+  modal.style.display = 'flex';
+  modal.style.flexDirection = 'column';
+
+  const container = document.getElementById('crop-container');
+  const cropImg = document.getElementById('crop-image');
+
+  // Ждём, пока modal отрисуется, чтобы узнать размеры
+  setTimeout(function() {
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+
+    // Размер рамки — квадрат 80% от меньшей стороны
+    const frameSize = Math.min(cw, ch) * 0.8;
+    const frameLeft = (cw - frameSize) / 2;
+    const frameTop = (ch - frameSize) / 2;
+
+    const frame = document.getElementById('crop-frame');
+    frame.style.left = frameLeft + 'px';
+    frame.style.top = frameTop + 'px';
+    frame.style.width = frameSize + 'px';
+    frame.style.height = frameSize + 'px';
+
+    // Стартовый масштаб — чтобы картинка покрывала рамку
+    const scaleX = frameSize / img.naturalWidth;
+    const scaleY = frameSize / img.naturalHeight;
+    const scale = Math.max(scaleX, scaleY);
+
+    cropState.img = img;
+    cropState.scale = scale;
+    cropState.minScale = scale;
+    cropState.offsetX = (cw - img.naturalWidth * scale) / 2;
+    cropState.offsetY = (ch - img.naturalHeight * scale) / 2;
+    cropState.targetId = targetId;
+    cropState.event = event;
+    cropState.containerW = cw;
+    cropState.containerH = ch;
+    cropState.frameSize = frameSize;
+    cropState.frameLeft = frameLeft;
+    cropState.frameTop = frameTop;
+
+    cropImg.src = img.src;
+    cropImg.style.width = (img.naturalWidth * scale) + 'px';
+    cropImg.style.height = (img.naturalHeight * scale) + 'px';
+    cropImg.style.left = cropState.offsetX + 'px';
+    cropImg.style.top = cropState.offsetY + 'px';
+
+    initCropGestures();
+  }, 100);
+}
+
+function initCropGestures() {
+  const container = document.getElementById('crop-container');
+  const cropImg = document.getElementById('crop-image');
+
+  // Удаляем старые обработчики (если были)
+  const newContainer = container.cloneNode(true);
+  container.parentNode.replaceChild(newContainer, container);
+
+  // Ищем img заново (после cloneNode)
+  const newImg = newContainer.querySelector('#crop-image');
+  const newFrame = newContainer.querySelector('#crop-frame');
+
+  let startX = 0, startY = 0;
+  let startOffsetX = 0, startOffsetY = 0;
+  let startDist = 0, startScale = 1;
+  let isPinching = false;
+
+  function updateImage() {
+    newImg.style.left = cropState.offsetX + 'px';
+    newImg.style.top = cropState.offsetY + 'px';
+    newImg.style.width = (cropState.img.naturalWidth * cropState.scale) + 'px';
+    newImg.style.height = (cropState.img.naturalHeight * cropState.scale) + 'px';
+  }
+
+  function clampOffsets() {
+    const imgW = cropState.img.naturalWidth * cropState.scale;
+    const imgH = cropState.img.naturalHeight * cropState.scale;
+    // Картинка должна закрывать рамку
+    const minX = cropState.frameLeft + cropState.frameSize - imgW;
+    const maxX = cropState.frameLeft;
+    const minY = cropState.frameTop + cropState.frameSize - imgH;
+    const maxY = cropState.frameTop;
+
+    if (cropState.offsetX < minX) cropState.offsetX = minX;
+    if (cropState.offsetX > maxX) cropState.offsetX = maxX;
+    if (cropState.offsetY < minY) cropState.offsetY = minY;
+    if (cropState.offsetY > maxY) cropState.offsetY = maxY;
+  }
+
+  // Touch события
+  newContainer.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+      isPinching = false;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startOffsetX = cropState.offsetX;
+      startOffsetY = cropState.offsetY;
+    } else if (e.touches.length === 2) {
+      isPinching = true;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      startDist = Math.sqrt(dx * dx + dy * dy);
+      startScale = cropState.scale;
+    }
+  }, { passive: true });
+
+  newContainer.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (e.touches.length === 1 && !isPinching) {
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      cropState.offsetX = startOffsetX + dx;
+      cropState.offsetY = startOffsetY + dy;
+      clampOffsets();
+      updateImage();
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const newScale = startScale * (dist / startDist);
+      cropState.scale = Math.max(cropState.minScale, newScale);
+      clampOffsets();
+      updateImage();
+    }
+  }, { passive: false });
+
+  newContainer.addEventListener('touchend', function(e) {
+    if (e.touches.length === 0) isPinching = false;
+  }, { passive: true });
+
+  // Mouse события (для теста на компьютере)
+  let isDragging = false;
+  newContainer.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startOffsetX = cropState.offsetX;
+    startOffsetY = cropState.offsetY;
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    cropState.offsetX = startOffsetX + dx;
+    cropState.offsetY = startOffsetY + dy;
+    clampOffsets();
+    updateImage();
+  });
+  window.addEventListener('mouseup', function() { isDragging = false; });
+
+  // Wheel zoom (для теста на компьютере)
+  newContainer.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    cropState.scale = Math.max(cropState.minScale, cropState.scale * (e.deltaY < 0 ? 1.1 : 0.9));
+    clampOffsets();
+    updateImage();
+  }, { passive: false });
+}
+
+function closeCropModal() {
+  document.getElementById('crop-modal').style.display = 'none';
+  if (cropState.event) cropState.event.target.value = '';
+  cropState.img = null;
+}
+
+function applyCrop() {
+  const img = cropState.img;
+  if (!img) return;
+
+  // Координаты обрезки в пикселях оригинала
+  const sx = (cropState.frameLeft - cropState.offsetX) / cropState.scale;
+  const sy = (cropState.frameTop - cropState.offsetY) / cropState.scale;
+  const sSize = cropState.frameSize / cropState.scale;
+
+  const canvas = document.getElementById('crop-canvas');
+  canvas.width = 1200;
+  canvas.height = 1200;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, 1200, 1200);
+
+  canvas.toBlob(function(blob) {
+    const newFile = new File([blob], 'cropped.png', { type: 'image/png' });
+    document.getElementById('crop-modal').style.display = 'none';
+
+    // Отправляем в сканер
+    processCroppedFile(newFile, cropState.targetId, cropState.event);
+    cropState.img = null;
+  }, 'image/png', 1.0);
+}
+
+function processCroppedFile(file, targetId, event) {
   const statusEl = document.getElementById(targetId);
-  statusEl.innerHTML = '<div class="card info" style="margin-top:12px;">⏳ Загружаю фото в высоком качестве...</div>';
+  statusEl.innerHTML = '<div class="card info" style="margin-top:12px;">⏳ Распознаю штрих-код...</div>';
 
   if (!document.getElementById('photo-temp')) {
     const div = document.createElement('div');
@@ -695,98 +914,29 @@ function scanPhoto(event, targetId) {
     div.style.display = 'none';
     document.body.appendChild(div);
   }
-
   const tempScanner = new Html5Qrcode("photo-temp");
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      canvas.toBlob(function(blob) {
-        const newFile = new File([blob], 'photo.png', { type: 'image/png' });
-
-        tempScanner.scanFile(newFile, false)
-          .then(function(decodedText) {
-            const code = decodedText.toUpperCase();
-            document.getElementById('in-track').value = code;
-            statusEl.innerHTML = '<div class="card found" style="margin-top:12px;">' +
-              '<h3>✅ Распознано</h3>' +
-              '<p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p>' +
-              '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Перейдите в «Добавить вручную» и заполните поля</p>' +
-              '</div>';
-            if (navigator.vibrate) navigator.vibrate(120);
-            event.target.value = '';
-            tempScanner.clear();
-          })
-          .catch(function() {
-            retryCenterCrop(canvas, tempScanner, statusEl, event);
-          });
-      }, 'image/png', 1.0);
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function retryCenterCrop(canvas, tempScanner, statusEl, event) {
-  try {
-    const w = canvas.width;
-    const h = canvas.height;
-    const cropW = Math.floor(w * 0.7);
-    const cropH = Math.floor(h * 0.7);
-    const cropX = Math.floor((w - cropW) / 2);
-    const cropY = Math.floor((h - cropH) / 2);
-
-    const cropCanvas = document.createElement('canvas');
-    cropCanvas.width = cropW;
-    cropCanvas.height = cropH;
-    const ctx = cropCanvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-
-    cropCanvas.toBlob(function(blob) {
-      const newFile = new File([blob], 'photo-crop.png', { type: 'image/png' });
-      tempScanner.scanFile(newFile, false)
-        .then(function(decodedText) {
-          const code = decodedText.toUpperCase();
-          document.getElementById('in-track').value = code;
-          statusEl.innerHTML = '<div class="card found" style="margin-top:12px;">' +
-            '<h3>✅ Распознано</h3>' +
-            '<p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p>' +
-            '</div>';
-          if (navigator.vibrate) navigator.vibrate(120);
-          event.target.value = '';
-          tempScanner.clear();
-        })
-        .catch(function() {
-          statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;">' +
-            '<h3>❌ Не удалось распознать</h3>' +
-            '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Попробуйте:</p>' +
-            '<ul style="margin-top:6px;padding-left:20px;font-size:13px;color:var(--text-secondary);line-height:1.7;">' +
-            '<li>Сфотографировать <strong>ближе</strong> к штрих-коду</li>' +
-            '<li>Убрать блики и тени</li>' +
-            '<li>Держать телефон <strong>ровно</strong> параллельно этикетке</li>' +
-            '<li>Ввести трек-номер вручную на вкладке «Добавить вручную»</li>' +
-            '</ul>' +
-            '</div>';
-          event.target.value = '';
-          tempScanner.clear();
-        });
-    }, 'image/png', 1.0);
-  } catch (err) {
-    statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;"><h3>❌ Ошибка</h3><p>Попробуйте другое фото.</p></div>';
-    event.target.value = '';
-    tempScanner.clear();
-  }
+  tempScanner.scanFile(file, false)
+    .then(function(decodedText) {
+      const code = decodedText.toUpperCase();
+      document.getElementById('in-track').value = code;
+      statusEl.innerHTML = '<div class="card found" style="margin-top:12px;">' +
+        '<h3>✅ Распознано</h3>' +
+        '<p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p>' +
+        '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Перейдите в «Добавить вручную»</p>' +
+        '</div>';
+      if (navigator.vibrate) navigator.vibrate(120);
+      if (event) event.target.value = '';
+      tempScanner.clear();
+    })
+    .catch(function() {
+      statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;">' +
+        '<h3>❌ Не удалось распознать</h3>' +
+        '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Попробуйте обрезать фото плотнее к штрих-коду.</p>' +
+        '</div>';
+      if (event) event.target.value = '';
+      tempScanner.clear();
+    });
 }
 // ==================== ШТРИХ-КОД ====================
 function generateBarcode() {
