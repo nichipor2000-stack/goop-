@@ -719,14 +719,16 @@ function savePackage() {
   const person = document.getElementById('in-person').value.trim();
   const weight = document.getElementById('in-weight').value.trim();
   const desc = document.getElementById('in-desc').value.trim();
+  const count = document.getElementById('in-count').value.trim();
   if (!track) { alert('Введите трек-номер'); return; }
   const db = loadDB();
-  db[track] = { person: person, weight: weight, desc: desc, addedAt: Date.now() };
+  db[track] = { person: person, weight: weight, desc: desc, count: count, addedAt: Date.now() };
   saveDB(db);
   document.getElementById('in-track').value = '';
   document.getElementById('in-person').value = '';
   document.getElementById('in-weight').value = '';
   document.getElementById('in-desc').value = '';
+  document.getElementById('in-count').value = '';
   document.getElementById('barcode-preview').style.display = 'none';
   document.getElementById('photo-status').innerHTML = '';
   alert('✅ Сохранено: ' + track);
