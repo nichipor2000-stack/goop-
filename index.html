@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e40af">
+<title>📦 Посылки</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --primary-light: #dbeafe;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --warning: #ea580c;
+    --purple: #7c3aed;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 20px;
+    overflow-x: hidden;
+  }
+
+  .welcome-screen {
+    position: fixed; inset: 0;
+    background: linear-gradient(160deg, #1e40af 0%, #2563eb 40%, #3b82f6 100%);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .welcome-card {
+    background: white; border-radius: 24px; padding: 28px 22px;
+    width: 100%; max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .welcome-logo { font-size: 60px; line-height: 1; margin-bottom: 12px; }
+  .welcome-title { font-size: 24px; font-weight: 800; color: var(--primary-dark); margin-bottom: 6px; }
+  .welcome-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 22px; line-height: 1.4; }
+  .welcome-tabs { display: flex; gap: 6px; background: var(--bg); padding: 4px; border-radius: 12px; margin-bottom: 18px; }
+  .welcome-tab { flex: 1; padding: 10px; text-align: center; border-radius: 9px; font-size: 14px; font-weight: 700; color: var(--text-secondary); cursor: pointer; }
+  .welcome-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .welcome-error { background: var(--danger-light); color: var(--danger); font-size: 13px; font-weight: 600; padding: 10px 14px; border-radius: 10px; margin-top: 8px; text-align: left; }
+  .welcome-note { font-size: 11px; color: var(--text-secondary); margin-top: 16px; line-height: 1.5; }
+
+  .greet-screen {
+    position: fixed; inset: 0;
+    background: linear-gradient(160deg, #1e40af 0%, #2563eb 40%, #3b82f6 100%);
+    z-index: 9998;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .greet-card {
+    background: white; border-radius: 24px; padding: 40px 28px;
+    width: 100%; max-width: 380px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .greet-emoji { font-size: 70px; line-height: 1; margin-bottom: 16px; }
+  .greet-title { font-size: 22px; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; }
+  .greet-name { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 20px; }
+  .greet-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+
+  .app-header {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+    color: white; padding: 16px 16px 20px;
+    display: flex; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+  }
+  .menu-btn {
+    background: rgba(255,255,255,0.15); border: none; color: white;
+    width: 44px; height: 44px; border-radius: 12px; font-size: 22px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .menu-btn:active { background: rgba(255,255,255,0.3); }
+  .header-title { flex: 1; min-width: 0; }
+  .header-title h1 { font-size: 18px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .header-title p { font-size: 12px; opacity: 0.85; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .logout-btn {
+    background: rgba(255,255,255,0.15); border: none; color: white;
+    width: 44px; height: 44px; border-radius: 12px; font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logout-btn:active { background: rgba(255,255,255,0.35); }
+
+  .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.25s; backdrop-filter: blur(2px); }
+  .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: 290px; max-width: 85vw;
+    height: 100vh; background: var(--card); z-index: 201;
+    transform: translateX(-100%); transition: transform 0.3s ease;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.15);
+    display: flex; flex-direction: column;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-header { padding: 20px; background: linear-gradient(135deg, #1e40af, #2563eb); color: white; display: flex; justify-content: space-between; align-items: center; }
+  .sidebar-header h2 { font-size: 16px; font-weight: 700; }
+  .sidebar-close { background: rgba(255,255,255,0.15); border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; }
+  .sidebar-body { flex: 1; overflow-y: auto; padding: 12px; }
+  .menu-item {
+    padding: 14px 16px; border-radius: 12px; cursor: pointer;
+    margin-bottom: 6px; display: flex; align-items: center; gap: 12px;
+    border: 1.5px solid transparent;
+    font-weight: 600; font-size: 14px; color: var(--text);
+  }
+  .menu-item:active { background: var(--primary-light); }
+  .menu-item.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+  .menu-item .menu-icon { font-size: 22px; width: 28px; text-align: center; }
+  .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-secondary); text-align: center; }
+
+  .main-content { padding: 16px; }
+
+  .card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .card h3 { font-size: 16px; margin-bottom: 10px; color: var(--primary-dark); word-break: break-all; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card p { font-size: 14px; margin: 6px 0; line-height: 1.5; }
+  .card .label { color: var(--text-secondary); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px; }
+  .card.found { border-left: 5px solid var(--success); background: linear-gradient(to right, var(--success-light) 0%, white 15%); }
+  .card.notfound { border-left: 5px solid var(--danger); background: linear-gradient(to right, var(--danger-light) 0%, white 15%); }
+  .card.info { border-left: 5px solid var(--primary); }
+  .card.clickable { cursor: pointer; }
+  .card.clickable:active { transform: scale(0.98); box-shadow: var(--shadow-lg); }
+
+  input, button, select {
+    width: 100%; padding: 14px 16px; border-radius: 12px; font-size: 15px;
+    border: 1.5px solid var(--border); margin-bottom: 10px; font-family: inherit;
+    background: var(--card); color: var(--text);
+  }
+  input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  input::placeholder { color: #94a3b8; }
+  button { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); display: flex; align-items: center; justify-content: center; gap: 8px; }
+  button:active { transform: scale(0.97); }
+  button.danger { background: linear-gradient(135deg, #dc2626, #ef4444); }
+  button.success { background: linear-gradient(135deg, #16a34a, #22c55e); }
+  button.orange { background: linear-gradient(135deg, #ea580c, #f97316); }
+  button.purple { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+  button.ghost { background: white; color: var(--primary); border: 1.5px solid var(--primary); box-shadow: none; }
+
+  .empty { text-align: center; color: var(--text-secondary); padding: 50px 30px; font-size: 14px; background: var(--card); border-radius: 20px; box-shadow: var(--shadow); }
+  .empty .icon { font-size: 44px; display: block; margin-bottom: 12px; opacity: 0.5; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card { background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 14px 8px; border-radius: 14px; box-shadow: var(--shadow); text-align: center; }
+  .stat-card .num { font-size: 22px; font-weight: 800; color: var(--primary-dark); line-height: 1.2; }
+  .stat-card .lbl { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+
+  #reader-scan, #reader-add { width: 100%; border-radius: 20px; overflow: hidden; background: #000; min-height: 260px; box-shadow: var(--shadow-lg); position: relative; }
+  #reader-scan video, #reader-add video { border-radius: 20px; }
+  .scan-hint { text-align: center; color: var(--text-secondary); font-size: 12px; margin: 10px 0; }
+
+  .recent-scans { margin-top: 12px; }
+  .recent-scans h4 { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .recent-item { background: white; border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--text); box-shadow: var(--shadow); display: flex; align-items: center; gap: 8px; }
+
+  .converter-card { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .converter-title { font-size: 16px; font-weight: 800; color: var(--primary-dark); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .rate-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .rate-row label { font-size: 13px; font-weight: 700; color: var(--text-secondary); min-width: 130px; }
+  .rate-row input { margin-bottom: 0; flex: 1; }
+  .currency-input { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; position: relative; }
+  .currency-input input { margin-bottom: 0; padding-right: 60px; font-size: 22px; font-weight: 700; text-align: right; }
+  .currency-input .curr-label { position: absolute; right: 18px; font-weight: 800; color: var(--text-secondary); font-size: 14px; pointer-events: none; }
+  .currency-input .flag { font-size: 24px; flex-shrink: 0; width: 32px; text-align: center; }
+  .swap-btn { display: flex; align-items: center; justify-content: center; margin: 6px auto; width: 46px; height: 46px; border-radius: 50%; background: white; color: var(--primary); font-size: 22px; box-shadow: var(--shadow-lg); border: 2px solid var(--primary-light); cursor: pointer; }
+  .currency-select { display: flex; gap: 8px; margin-bottom: 10px; }
+  .currency-select button { flex: 1; padding: 10px; font-size: 13px; margin-bottom: 0; }
+  .result-box { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; box-shadow: var(--shadow); border: 2px dashed var(--primary-light); }
+  .result-box .result-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .result-box .result-value { font-size: 30px; font-weight: 800; color: var(--primary-dark); line-height: 1.2; word-break: break-all; }
+  .result-box .result-sub { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+
+  .person-detail-header {
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    color: white; border-radius: 20px; padding: 24px 20px;
+    margin-bottom: 16px; text-align: center;
+  }
+  .person-detail-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 800; margin: 0 auto 12px;
+    border: 3px solid rgba(255,255,255,0.4);
+  }
+  .person-detail-name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .person-detail-sub { font-size: 13px; opacity: 0.85; }
+  .person-detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .person-detail-stats .stat-card { background: white; box-shadow: var(--shadow); }
+
+  .track-list-item {
+    background: white; border-radius: 14px; padding: 14px 16px;
+    margin-bottom: 10px; box-shadow: var(--shadow);
+    border-left: 5px solid var(--primary);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .track-number {
+    background: var(--primary); color: white;
+    min-width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; flex-shrink: 0;
+  }
+  .track-content { flex: 1; min-width: 0; }
+  .track-code { font-family: 'Courier New', monospace; font-weight: 700; font-size: 14px; color: var(--primary-dark); word-break: break-all; margin-bottom: 6px; }
+  .track-meta { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .track-meta strong { color: var(--text); font-weight: 700; }
+
+  .footer { text-align: center; padding: 16px; color: var(--text-secondary); font-size: 11px; font-weight: 600; letter-spacing: 1px; }
+  .footer strong { color: var(--primary-dark); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============ ЭКРАН РЕГИСТРАЦИИ / ВХОДА ============ -->
+<div class="welcome-screen" id="welcome-screen">
+  <div class="welcome-card">
+    <div class="welcome-logo">📦</div>
+    <h1 class="welcome-title">Мои посылки</h1>
+    <p class="welcome-subtitle">Войдите или создайте аккаунт</p>
+
+    <div class="welcome-tabs">
+      <div class="welcome-tab active" id="tab-login" onclick="switchWelcomeTab('login')">Вход</div>
+      <div class="welcome-tab" id="tab-register" onclick="switchWelcomeTab('register')">Регистрация</div>
+    </div>
+
+    <div id="welcome-login">
+      <input id="login-nick" placeholder="Ник" autocomplete="username">
+      <input id="login-pass" type="password" placeholder="Пароль" autocomplete="current-password">
+      <button onclick="doLogin()">🔓 Войти</button>
+    </div>
+
+    <div id="welcome-register" style="display:none;">
+      <input id="reg-nick" placeholder="Придумайте ник" autocomplete="off">
+      <input id="reg-pass" type="password" placeholder="Придумайте пароль" autocomplete="new-password">
+      <input id="reg-pass2" type="password" placeholder="Повторите пароль" autocomplete="new-password">
+      <button class="success" onclick="doRegister()">✅ Зарегистрироваться</button>
+    </div>
+
+    <div id="welcome-error" style="display:none;" class="welcome-error"></div>
+    <p class="welcome-note">Данные хранятся только на вашем устройстве</p>
+  </div>
+</div>
+
+<!-- ============ ОКНО ПРИВЕТСТВИЯ ============ -->
+<div class="greet-screen" id="greet-screen" style="display:none;">
+  <div class="greet-card">
+    <div class="greet-emoji">🎉</div>
+    <div class="greet-title">Добро пожаловать!</div>
+    <div class="greet-name" id="greet-name">—</div>
+    <div class="greet-sub">Рады видеть вас снова</div>
+    <button class="success" onclick="closeGreeting()" style="max-width:220px;margin:0 auto;">Продолжить ➜</button>
+  </div>
+</div>
+
+<!-- ============ ШАПКА ============ -->
+<header class="app-header" id="app-header" style="display:none;">
+  <button class="menu-btn" onclick="openSidebar()">☰</button>
+  <div class="header-title">
+    <h1 id="header-title">📦 Сканер</h1>
+    <p id="header-subtitle">Готов к работе</p>
+  </div>
+  <button class="logout-btn" onclick="logout()" title="Выйти">🚪</button>
+</header>
+
+<!-- ============ БОКОВОЕ МЕНЮ ============ -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>📦 Меню</h2>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <div class="sidebar-body">
+    <div class="menu-item active" data-menu="scan" onclick="switchMenu('scan')">
+      <span class="menu-icon">📷</span> Сканер
+    </div>
+    <div class="menu-item" data-menu="add-scan" onclick="switchMenu('add-scan')">
+      <span class="menu-icon">📸</span> Добавление трека
+    </div>
+    <div class="menu-item" data-menu="add-manual" onclick="switchMenu('add-manual')">
+      <span class="menu-icon">✍️</span> Добавить вручную
+    </div>
+    <div class="menu-item" data-menu="add-batch" onclick="switchMenu('add-batch')">
+      <span class="menu-icon">📋</span> Треки к имени
+    </div>
+    <div class="menu-item" data-menu="converter" onclick="switchMenu('converter')">
+      <span class="menu-icon">💱</span> Конвертер
+    </div>
+    <div class="menu-item" data-menu="history" onclick="switchMenu('history')">
+      <span class="menu-icon">🕓</span> История
+    </div>
+    <div class="menu-item" data-menu="packages" onclick="switchMenu('packages')">
+      <span class="menu-icon">📦</span> Посылки
+    </div>
+  </div>
+  <div class="sidebar-footer">Автор: <strong>NN</strong></div>
+</aside>
+
+<!-- ============ ОСНОВНОЙ КОНТЕНТ ============ -->
+<main class="main-content" id="main-content" style="display:none;">
+
+  <div id="screen-scan" class="screen">
+    <div id="reader-scan"></div>
+    <div class="scan-hint">Наведите камеру на штрих-код</div>
+    <div id="scan-result-scan" style="margin-top:12px;"></div>
+    <div class="recent-scans">
+      <h4>Последние сканирования</h4>
+      <div id="recent-list"></div>
+    </div>
+  </div>
+
+  <div id="screen-add-scan" class="screen hidden">
+    <div class="card">
+      <h3>📁 Из галереи</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Загрузите фото штрих-кода</p>
+      <button class="orange" onclick="document.getElementById('photo-input').click()">📷 Выбрать фото</button>
+      <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="scanPhoto(event, 'photo-status')">
+      <div id="photo-status"></div>
+    </div>
+    <div class="divider">или через камеру</div>
+    <div id="reader-add"></div>
+    <div class="scan-hint">Наведите камеру — трек добавится в форму</div>
+    <div id="add-scan-result" style="margin-top:12px;"></div>
+  </div>
+
+  <div id="screen-add-manual" class="screen hidden">
+    <input id="in-track" placeholder="Трек-номер (RU123456789)" autocomplete="off">
+    <div style="display:flex; gap:8px;">
+      <input id="in-person" placeholder="Для кого" autocomplete="off" style="font-style: italic;">
+      <button class="purple" style="width:auto;padding:14px 18px;margin-bottom:10px;flex-shrink:0;" onclick="startVoiceAdd()">🎤</button>
+    </div>
+    <input id="in-weight" placeholder="Вес в кг (2.5)" type="number" step="0.01" inputmode="decimal">
+    <input id="in-desc" placeholder="Что в треке" autocomplete="off">
+    
+    <button class="success" onclick="generateBarcode()">📊 Сгенерировать штрих-код</button>
+    
+    <div id="barcode-preview" style="display:none;background:white;padding:20px;border-radius:16px;text-align:center;margin-bottom:12px;border:2px dashed var(--primary-light);">
+      <svg id="barcode-svg"></svg>
+      <p id="barcode-text" style="font-family:monospace;font-size:17px;font-weight:bold;margin-top:12px;letter-spacing:2px;"></p>
+      <button class="ghost" style="margin-top:12px;" onclick="saveBarcodeImage()">💾 Скачать</button>
+    </div>
+
+    <button onclick="savePackage()">💾 Сохранить в базу</button>
+  </div>
+
+  <div id="screen-add-batch" class="screen hidden">
+    <div class="card">
+      <h3>👤 Имя получателя</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Все треки ниже будут сохранены для этого имени</p>
+      <input id="batch-person" placeholder="Например: Вика" autocomplete="off" style="font-style: italic;">
+    </div>
+
+    <div class="card">
+      <h3>📦 Добавить трек</h3>
+      <input id="batch-track" placeholder="Трек-номер" autocomplete="off">
+      <input id="batch-weight" placeholder="Вес в кг" type="number" step="0.01" inputmode="decimal">
+      <input id="batch-desc" placeholder="Что в треке" autocomplete="off">
+      <button class="success" onclick="batchAddTrack()">➕ Добавить в список</button>
+    </div>
+
+    <div id="batch-preview"></div>
+    <button class="danger hidden" id="batch-save-btn" onclick="batchSaveAll()">💾 Сохранить все треки</button>
+  </div>
+
+  <div id="screen-converter" class="screen hidden">
+    <div class="converter-card">
+      <div class="converter-title">💱 Настройки курса</div>
+      <div class="rate-row">
+        <label id="rate-label">1 CNY = ? BYN</label>
+        <input id="rate-value" type="number" step="0.0001" inputmode="decimal" placeholder="4.5000" value="4.5000">
+      </div>
+    </div>
+
+    <div class="converter-card">
+      <div class="converter-title">💱 Конвертер</div>
+      <div class="currency-select">
+        <button class="ghost" id="currency-btn-1" onclick="openCurrencyPicker(1)">🇧🇾 BYN ▼</button>
+        <button class="ghost" id="currency-btn-2" onclick="openCurrencyPicker(2)">🇨🇳 CNY ▼</button>
+      </div>
+
+      <div class="currency-input">
+        <span class="flag" id="flag-1">🇧🇾</span>
+        <input id="input-1" type="number" step="0.01" inputmode="decimal" placeholder="0.00" oninput="convertCurrency(1)">
+        <span class="curr-label" id="label-1">BYN</span>
+      </div>
+
+      <div class="swap-btn" onclick="swapCurrencies()">⇅</div>
+
+      <div class="currency-input">
+        <span class="flag" id="flag-2">🇨🇳</span>
+        <input id="input-2" type="number" step="0.01" inputmode="decimal" placeholder="0.00" oninput="convertCurrency(2)">
+        <span class="curr-label" id="label-2">CNY</span>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">Результат</div>
+      <div class="result-value" id="result-value">0.00</div>
+      <div class="result-sub" id="result-sub">Введите сумму</div>
+    </div>
+
+    <button class="ghost" onclick="clearConverter()" style="margin-top:16px;">🗑 Очистить</button>
+  </div>
+
+  <div id="screen-history" class="screen hidden">
+    <div class="card" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
+      <h3>🕓 История сканирований</h3>
+      <p style="font-size:13px;color:#78350f;">Здесь все треки, которые вы отсканировали</p>
+    </div>
+    <div id="history-list"></div>
+    <button class="danger hidden" id="clear-history-btn" onclick="clearHistory()" style="margin-top:12px;">🗑 Очистить историю</button>
+  </div>
+
+  <div id="screen-packages" class="screen hidden">
+    <div class="stats" id="packages-stats"></div>
+    <h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;letter-spacing:0.5px;">👥 По именам (нажмите для деталей)</h3>
+    <div id="packages-persons"></div>
+    <h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;letter-spacing:0.5px;">📦 Все треки</h3>
+    <div id="packages-list"></div>
+  </div>
+
+  <div id="screen-person-detail" class="screen hidden">
+    <button class="ghost" onclick="switchMenu('packages')" style="margin-bottom:14px;">← Назад к посылкам</button>
+    <div id="person-detail-content"></div>
+  </div>
+
+</main>
+
+<div class="footer" id="footer" style="display:none;">Автор: <strong>NN</strong></div>
+
+<script>
+// ============================================
+// АВТОРИЗАЦИЯ
+// ============================================
+const USERS_KEY = 'users_db_v1';
+const SESSION_KEY = 'current_session_v1';
+
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+function getCurrentUser() { return localStorage.getItem(SESSION_KEY); }
+function setCurrentUser(nick) { localStorage.setItem(SESSION_KEY, nick); }
+
+function switchWelcomeTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('welcome-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('welcome-register').style.display = tab === 'register' ? 'block' : 'none';
+  showWelcomeError('');
+}
+
+function showWelcomeError(msg) {
+  const el = document.getElementById('welcome-error');
+  if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+  el.style.display = 'block';
+  el.textContent = msg;
+}
+
+function doRegister() {
+  const nick = document.getElementById('reg-nick').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  if (nick.length < 3) return showWelcomeError('Ник минимум 3 символа');
+  if (pass.length < 4) return showWelcomeError('Пароль минимум 4 символа');
+  if (pass !== pass2) return showWelcomeError('Пароли не совпадают');
+  const users = loadUsers();
+  const key = nick.toLowerCase();
+  if (users[key]) return showWelcomeError('Такой ник уже существует');
+  users[key] = { nick, pass, createdAt: Date.now() };
+  saveUsers(users);
+  setCurrentUser(nick);
+  afterAuth(nick);
+}
+
+function doLogin() {
+  const nick = document.getElementById('login-nick').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!nick || !pass) return showWelcomeError('Введите ник и пароль');
+  const users = loadUsers();
+  const user = users[nick.toLowerCase()];
+  if (!user) return showWelcomeError('Пользователь не найден');
+  if (user.pass !== pass) return showWelcomeError('Неверный пароль');
+  setCurrentUser(user.nick);
+  afterAuth(user.nick);
+}
+
+function afterAuth(nick) {
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('greet-name').textContent = nick;
+  document.getElementById('greet-screen').style.display = 'flex';
+}
+
+function closeGreeting() {
+  document.getElementById('greet-screen').style.display = 'none';
+  document.getElementById('app-header').style.display = 'flex';
+  document.getElementById('main-content').style.display = 'block';
+  document.getElementById('footer').style.display = 'block';
+  renderRecentScans();
+  renderHistory();
+  switchMenu('scan');
+}
+
+function checkAuth() {
+  const user = getCurrentUser();
+  if (user) {
+    document.getElementById('welcome-screen').style.display = 'none';
+    document.getElementById('greet-name').textContent = user;
+    document.getElementById('greet-screen').style.display = 'flex';
+  } else {
+    document.getElementById('welcome-screen').style.display = 'flex';
+    document.getElementById('greet-screen').style.display = 'none';
+    document.getElementById('app-header').style.display = 'none';
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('footer').style.display = 'none';
+  }
+}
+
+function logout() {
+  if (!confirm('Выйти из аккаунта?')) return;
+  localStorage.removeItem(SESSION_KEY);
+  document.getElementById('greet-screen').style.display = 'none';
+  document.getElementById('welcome-screen').style.display = 'flex';
+  document.getElementById('login-nick').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('reg-nick').value = '';
+  document.getElementById('reg-pass').value = '';
+  document.getElementById('reg-pass2').value = '';
+  showWelcomeError('');
+  switchWelcomeTab('login');
+}
+
+// ============================================
+// ХРАНИЛИЩА
+// ============================================
+const STORAGE_KEY = 'packages_db_v5';
+const HISTORY_KEY = 'scan_history_v1';
+const RECENT_KEY = 'recent_scans_v1';
+
+function loadDB() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (e) { return {}; } }
+function saveDB(db) { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; } }
+function saveHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }
+function loadRecent() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) { return []; } }
+function saveRecent(r) { localStorage.setItem(RECENT_KEY, JSON.stringify(r)); }
+
+function addToHistory(track) {
+  const h = loadHistory();
+  if (!h.some(x => x.track === track)) {
+    h.unshift({ track, time: Date.now() });
+    saveHistory(h.slice(0, 200));
+  }
+  const r = loadRecent();
+  const filtered = r.filter(x => x.track !== track);
+  filtered.unshift({ track, time: Date.now() });
+  saveRecent(filtered.slice(0, 3));
+  renderRecentScans();
+  renderHistory();
+}
+
+// ============================================
+// МЕНЮ
+// ============================================
+function switchMenu(menu) {
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+  const menuEl = document.querySelector('.menu-item[data-menu="' + menu + '"]');
+  if (menuEl) menuEl.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  const screen = document.getElementById('screen-' + menu);
+  if (screen) screen.classList.remove('hidden');
+  closeSidebar();
+  stopAllScanners();
+
+  const titles = {
+    'scan': ['📦 Сканер', 'Наведите на штрих-код'],
+    'add-scan': ['📸 Добавление трека', 'Камера или галерея'],
+    'add-manual': ['✍️ Добавить вручную', 'Заполните поля'],
+    'add-batch': ['📋 Треки к имени', 'Один человек — много треков'],
+    'converter': ['💱 Конвертер', 'BYN ⇄ CNY'],
+    'history': ['🕓 История', 'Все ваши сканирования'],
+    'packages': ['📦 Посылки', 'Общий вес и имена'],
+    'person-detail': ['👤 Детали', 'Информация о человеке']
+  };
+  if (titles[menu]) {
+    document.getElementById('header-title').textContent = titles[menu][0];
+    document.getElementById('header-subtitle').textContent = titles[menu][1];
+  }
+
+  if (menu === 'scan') startScanner('reader-scan', 'scan-result-scan', 'normal');
+  if (menu === 'add-scan') startScanner('reader-add', 'add-scan-result', 'add');
+  if (menu === 'history') renderHistory();
+  if (menu === 'packages') renderPackages();
+  if (menu === 'converter') convertCurrency(1);
+}
+
+function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('open'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('open'); }
+
+// ============================================
+// СКАНЕРЫ
+// ============================================
+let scanner = null;
+let scannerRunning = false;
+let lastScan = { code: '', time: 0 };
+
+function startScanner(readerId, resultId, mode) {
+  if (scannerRunning) return;
+  const readerEl = document.getElementById(readerId);
+  if (!readerEl) return;
+
+  scanner = new Html5Qrcode(readerId);
+  scannerRunning = true;
+
+  scanner.start(
+    { facingMode: "environment" },
+    {
+      fps: 10,
+      qrbox: { width: 280, height: 280 },
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.ITF
+      ]
+    },
+    function(text) { onScan(text, resultId, mode); },
+    function() {}
+  ).catch(function(err) {
+    scannerRunning = false;
+    const el = document.getElementById(resultId);
+    if (el) el.innerHTML = '<div class="card notfound"><h3>⚠️ Камера недоступна</h3><p>' + escapeHtml(String(err)) + '</p></div>';
+  });
+}
+
+function stopScanner() {
+  if (!scanner || !scannerRunning) return;
+  scannerRunning = false;
+  scanner.stop().then(function() { scanner.clear(); scanner = null; }).catch(function() { scanner = null; });
+}
+
+function stopAllScanners() { stopScanner(); }
+
+function onScan(text, resultId, mode) {
+  const now = Date.now();
+  if (text === lastScan.code && now - lastScan.time < 2500) return;
+  lastScan = { code: text, time: now };
+
+  const code = text.toUpperCase().trim();
+  const el = document.getElementById(resultId);
+  if (!el) return;
+
+  if (mode === 'add') {
+    document.getElementById('in-track').value = code;
+    el.innerHTML = '<div class="card found"><h3>✅ Распознано</h3><p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p><p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Перейдите в «Добавить вручную»</p></div>';
+    if (navigator.vibrate) navigator.vibrate(120);
+    addToHistory(code);
+    return;
+  }
+
+  const db = loadDB();
+  const p = db[code];
+  addToHistory(code);
+
+  if (p) {
+    el.innerHTML = '<div class="card found">' +
+      '<h3>✅ ' + escapeHtml(code) + '</h3>' +
+      '<p><span class="label">Для кого</span><em>' + escapeHtml(p.person || '—') + '</em></p>' +
+      '<p><span class="label">Вес</span>' + escapeHtml(p.weight || '—') + ' кг</p>' +
+      '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
+      '</div>';
+    if (navigator.vibrate) navigator.vibrate(120);
+  } else {
+    el.innerHTML = '<div class="card notfound">' +
+      '<h3>❓ ' + escapeHtml(code) + '</h3>' +
+      '<p>Такого трека нет в базе</p>' +
+      '<button class="success" style="margin-top:12px;" onclick="prefillAdd(\'' + escapeAttr(code) + '\')">➕ Добавить</button>' +
+      '</div>';
+    if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
+  }
+}
+
+function prefillAdd(track) {
+  document.getElementById('in-track').value = track;
+  switchMenu('add-manual');
+}
+
+// ============================================
+// НЕДАВНИЕ
+// ============================================
+function renderRecentScans() {
+  const recent = loadRecent();
+  const el = document.getElementById('recent-list');
+  if (!el) return;
+  if (recent.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-secondary);text-align:center;padding:10px;">Пока ничего не отсканировано</div>';
+    return;
+  }
+  el.innerHTML = recent.map(function(r) {
+    const t = new Date(r.time);
+    const time = t.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    return '<div class="recent-item">📦 ' + escapeHtml(r.track) + ' <span style="margin-left:auto;color:var(--text-secondary);font-weight:400;font-size:12px;">' + time + '</span></div>';
+  }).join('');
+}
+
+// ============================================
+// ИСТОРИЯ
+// ============================================
+function renderHistory() {
+  const history = loadHistory();
+  const el = document.getElementById('history-list');
+  const btn = document.getElementById('clear-history-btn');
+  if (!el) return;
+  if (history.length === 0) {
+    el.innerHTML = '<div class="empty"><span class="icon">🕓</span>История пуста</div>';
+    if (btn) btn.classList.add('hidden');
+    return;
+  }
+  if (btn) btn.classList.remove('hidden');
+  const db = loadDB();
+  el.innerHTML = history.map(function(h, i) {
+    const t = new Date(h.time);
+    const time = t.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const found = db[h.track];
+    return '<div class="card">' +
+      '<h3><span class="track-number" style="display:inline-flex;min-width:28px;height:28px;font-size:12px;">' + (i + 1) + '</span> 📦 ' + escapeHtml(h.track) + '</h3>' +
+      '<p style="font-size:12px;color:var(--text-secondary);">' + time + '</p>' +
+      (found ? '<p><span class="label">Для кого</span><em>' + escapeHtml(found.person || '—') + '</em></p>' : '<p style="font-size:13px;color:var(--text-secondary);">Нет в базе</p>') +
+      '</div>';
+  }).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Очистить всю историю?')) return;
+  saveHistory([]);
+  saveRecent([]);
+  renderHistory();
+  renderRecentScans();
+}
+
+// ============================================
+// ФОТО
+// ============================================
+function scanPhoto(event, targetId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById(targetId);
+  statusEl.innerHTML = '<div class="card info" style="margin-top:12px;">⏳ Распознаю...</div>';
+
+  if (!document.getElementById('photo-temp')) {
+    const div = document.createElement('div');
+    div.id = 'photo-temp';
+    div.style.display = 'none';
+    document.body.appendChild(div);
+  }
+  const tempScanner = new Html5Qrcode("photo-temp");
+
+  tempScanner.scanFile(file, true)
+    .then(function(decodedText) {
+      const code = decodedText.toUpperCase();
+      document.getElementById('in-track').value = code;
+      statusEl.innerHTML = '<div class="card found" style="margin-top:12px;"><h3>✅ Распознано</h3><p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p><p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Заполните остальные поля</p></div>';
+      event.target.value = '';
+      tempScanner.clear();
+    })
+    .catch(function() {
+      statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;"><h3>❌ Не удалось</h3><p>Попробуйте другое фото.</p></div>';
+      event.target.value = '';
+      tempScanner.clear();
+    });
+}
+
+// ============================================
+// ШТРИХ-КОД
+// ============================================
+function generateBarcode() {
+  const track = document.getElementById('in-track').value.trim().toUpperCase();
+  if (!track) { alert('Введите трек-номер'); return; }
+  const preview = document.getElementById('barcode-preview');
+  const svg = document.getElementById('barcode-svg');
+  const textEl = document.getElementById('barcode-text');
+  try {
+    JsBarcode(svg, track, { format: "CODE128", width: 2, height: 80, displayValue: true, fontSize: 16, margin: 10 });
+    textEl.textContent = track;
+    preview.style.display = 'block';
+    preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) { alert('Ошибка: недопустимые символы'); }
+}
+
+function saveBarcodeImage() {
+  const svg = document.getElementById('barcode-svg');
+  const track = document.getElementById('in-track').value.trim().toUpperCase();
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  canvas.width = 800; canvas.height = 300;
+  const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(svgBlob);
+  img.onload = function() {
+    ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 50, 50, 700, 150);
+    ctx.fillStyle = 'black'; ctx.font = 'bold 30px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(track, canvas.width / 2, 250);
+    const link = document.createElement('a');
+    link.download = 'barcode_' + track + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+// ============================================
+// СОХРАНЕНИЕ
+// ============================================
+function savePackage() {
+  const track = document.getElementById('in-track').value.trim().toUpperCase();
+  const person = document.getElementById('in-person').value.trim();
+  const weight = document.getElementById('in-weight').value.trim();
+  const desc = document.getElementById('in-desc').value.trim();
+  if (!track) { alert('Введите трек-номер'); return; }
+  const db = loadDB();
+  db[track] = { person: person, weight: weight, desc: desc, addedAt: Date.now() };
+  saveDB(db);
+  document.getElementById('in-track').value = '';
+  document.getElementById('in-person').value = '';
+  document.getElementById('in-weight').value = '';
+  document.getElementById('in-desc').value = '';
+  document.getElementById('barcode-preview').style.display = 'none';
+  document.getElementById('photo-status').innerHTML = '';
+  alert('✅ Сохранено: ' + track);
+}
+
+// ============================================
+// ПАКЕТНОЕ
+// ============================================
+let batchItems = [];
+
+function batchAddTrack() {
+  const person = document.getElementById('batch-person').value.trim();
+  const track = document.getElementById('batch-track').value.trim().toUpperCase();
+  const weight = document.getElementById('batch-weight').value.trim();
+  const desc = document.getElementById('batch-desc').value.trim();
+  if (!person) { alert('Введите имя получателя'); return; }
+  if (!track) { alert('Введите трек-номер'); return; }
+  batchItems.push({ person: person, track: track, weight: weight, desc: desc });
+  document.getElementById('batch-track').value = '';
+  document.getElementById('batch-weight').value = '';
+  document.getElementById('batch-desc').value = '';
+  renderBatchPreview();
+}
+
+function renderBatchPreview() {
+  const el = document.getElementById('batch-preview');
+  const btn = document.getElementById('batch-save-btn');
+  if (batchItems.length === 0) { el.innerHTML = ''; btn.classList.add('hidden'); return; }
+  btn.classList.remove('hidden');
+  el.innerHTML = '<div class="card"><h3>📋 Готово к сохранению (' + batchItems.length + ')</h3>' +
+    batchItems.map(function(it, i) {
+      return '<p style="border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px;">' +
+        '<span class="track-number" style="display:inline-flex;min-width:24px;height:24px;font-size:11px;">' + (i + 1) + '</span> ' +
+        '<strong>' + escapeHtml(it.track) + '</strong> ' +
+        '<button class="danger" style="width:auto;padding:4px 10px;font-size:11px;margin-left:8px;display:inline-flex;" onclick="batchRemove(' + i + ')">×</button><br>' +
+        '<em style="font-size:12px;color:var(--text-secondary);">' + escapeHtml(it.person) + '</em> · ' + escapeHtml(it.weight || '—') + ' кг' +
+        '</p>';
+    }).join('') + '</div>';
+}
+
+function batchRemove(i) { batchItems.splice(i, 1); renderBatchPreview(); }
+
+function batchSaveAll() {
+  if (batchItems.length === 0) return;
+  const db = loadDB();
+  batchItems.forEach(function(it) {
+    db[it.track] = { person: it.person, weight: it.weight, desc: it.desc, addedAt: Date.now() };
+  });
+  saveDB(db);
+  alert('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
+  batchItems = [];
+  renderBatchPreview();
+  document.getElementById('batch-person').value = '';
+}
+
+// ============================================
+// ПОСЫЛКИ
+// ============================================
+function renderPackages() {
+  const db = loadDB();
+  const keys = Object.keys(db);
+  const statsEl = document.getElementById('packages-stats');
+  const personsEl = document.getElementById('packages-persons');
+  const listEl = document.getElementById('packages-list');
+
+  const total = keys.length;
+  let totalWeight = 0;
+  keys.forEach(function(k) { totalWeight += parseFloat(db[k].weight) || 0; });
+
+  const persons = {};
+  keys.forEach(function(k) {
+    const name = (db[k].person || 'Без имени').trim();
+    if (!persons[name]) persons[name] = { count: 0, weight: 0 };
+    persons[name].count++;
+    persons[name].weight += parseFloat(db[k].weight) || 0;
+  });
+
+  statsEl.innerHTML =
+    '<div class="stat-card"><div class="num">' + total + '</div><div class="lbl">Треков</div></div>' +
+    '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
+    '<div class="stat-card"><div class="num">' + Object.keys(persons).length + '</div><div class="lbl">Людей</div></div>';
+
+  if (Object.keys(persons).length === 0) {
+    personsEl.innerHTML = '';
+  } else {
+    personsEl.innerHTML = Object.keys(persons).sort().map(function(name) {
+      return '<div class="card clickable" style="background:linear-gradient(to right,var(--primary-light),white);" onclick="openPersonDetail(\'' + escapeAttr(name) + '\')">' +
+        '<h3>👤 ' + escapeHtml(name) + ' <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">➜</span></h3>' +
+        '<p><span class="label">Треков</span>' + persons[name].count + '</p>' +
+        '<p><span class="label">Общий вес</span>' + persons[name].weight.toFixed(1) + ' кг</p>' +
+        '<UpperCasep style="font-size():12px;color:var(-- ===primary);margin-top input:8px;">Нажмите для подробностей</p.trim>' +
+        '</div>';
+    }).join('');
+  }
+
+  if (keys.length === 0) {
+    listEl.innerHTML = '<div class="empty"><span class="icon">📭</span>Пока нет треков</div>';
+    return;
+  }
+  listEl.innerHTML = keys.map(function(k, i) {
+    const p = db[k];
+    return '<div class="card">' +
+      '<h3><span class="track-number" style="display:inline-flex;min-width:28px;height:28px;font-size:12px;">' + (i + 1) + '</span> 📦 ' + escapeHtml(k) + '</h3>' +
+      '<p><span class="label">Для кого</span><em>' + escapeHtml(p.person || '—') + '</em></p>' +
+      '<p><span class="label">Вес</span>' + escapeHtml(p.weight || '—') + ' кг</p>' +
+      '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
+      '<button class="danger" style="margin-top:8px;" onclick="delPackage(\'' + escapeAttr(k) + '\')">🗑 Удалить</button>' +
+      '</div>';
+  }).join('');
+}
+
+function delPackage(key) {
+  if (!confirm('Удалить ' + key + '?')) return;
+  const db = loadDB();
+  delete db[key];
+  saveDB(db);
+  renderPackages();
+}
+
+// ============================================
+// ДЕТАЛИ ЧЕЛОВЕКА
+// ============================================
+function openPersonDetail(name) {
+  const db = loadDB();
+  const allKeys = Object.keys(db);
+  const tracks = allKeys.filter(function(k) { return (db[k].person || 'Без имени').trim() === name; });
+
+  if (tracks.length === 0) { alert('Нет треков'); return; }
+
+  let totalWeight = 0;
+  tracks.forEach(function(k) { totalWeight += parseFloat(db[k].weight) || 0; });
+  const initial = name.charAt(0).toUpperCase();
+
+  let content = '<div class="person-detail-header">' +
+    '<div class="person-detail-avatar">' + escapeHtml(initial) + '</div>' +
+    '<div class="person-detail-name">' + escapeHtml(name) + '</div>' +
+    '<div class="person-detail-sub">Все треки этого человека</div>' +
+    '</div>';
+
+  content += '<div class="person-detail-stats">' +
+    '<div class="stat-card"><div class="num">' + tracks.length + '</div><div class="lbl">Треков</div></div>' +
+    '<div class="stat-card"><div class="num">' + totalWeight.toFixed(1) + '</div><div class="lbl">Вес (кг)</div></div>' +
+    '<div class="stat-card"><div class="num">' + tracks.length + '</div><div class="lbl">Товаров</div></div>' +
+    '</div>';
+
+  content += '<h3 style="font-size:15px;color:var(--text-secondary);margin:16px 0 8px;text-transform:uppercase;letter-spacing:0.5px;">📦 Перечень треков</h3>';
+
+  content += tracks.map(function(k, i) {
+    const p = db[k];
+    return '<div class="track-list-item">' +
+      '<div class="track-number">' + (i + 1) + '</div>' +
+      '<div class="track-content">' +
+        '<div class="track-code">' + escapeHtml(k) + '</div>' +
+        '<div class="track-meta">' +
+          '<strong>Вес:</strong> ' + escapeHtml(p.weight || '—') + ' кг<br>' +
+          '<strong>Что в треке:</strong> ' + escapeHtml(p.desc || '—') +
+        '</div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+
+  document.getElementById('person-detail-content').innerHTML = content;
+  switchMenu('person-detail');
+}
+
+// ============================================
+// ГОЛОС
+// ============================================
+function startVoiceAdd() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Браузер не поддерживает голосовой ввод'); return; }
+  const rec = new SR();
+  rec.lang = 'ru-RU';
+  rec.onresult = function(e) {
+    document.getElementById('in-person').value = e.results[0][0].transcript.trim();
+  };
+  rec.start();
+}
+
+// ============================================
+// КОНВЕРТЕР
+// ============================================
+let currency1 = { code: 'BYN', flag: '🇧🇾', name: 'BYN' };
+let currency2 = { code: 'CNY', flag: '🇨🇳', name: 'CNY' };
+let lastEdited = 1;
+
+const CURRENCIES = [
+  { code: 'BYN', flag: '🇧🇾', name: 'BYN' },
+  { code: 'CNY', flag: '🇨🇳', name: 'CNY' },
+  { code: 'USD', flag: '🇺🇸', name: 'USD' },
+  { code: 'EUR', flag: '🇪🇺', name: 'EUR' },
+  { code: 'RUB', flag: '🇷🇺', name: 'RUB' },
+  { code: 'PLN', flag: '🇵🇱', name: 'PLN' }
+];
+
+function openCurrencyPicker(slot) {
+  const options = CURRENCIES.map(function(c) { return c.flag + ' ' + c.code; }).join('\n');
+  const input = prompt('Выберите валюту для поля ' + slot + ':\n\n' + options + '\n\nВведите код (например: USD)', slot === 1 ? currency1.code : currency2.code);
+  if (!input) return;
+  const found = CURRENCIES.find(function(c) { return c.code.to().toUpperCase(); });
+  if (!found) { alert('Валюта не найдена'); return; }
+  if (slot === 1) { currency1 = found; } else { currency2 = found; }
+  updateCurrencyUI();
+  convertCurrency(slot);
+}
+
+function updateCurrencyUI() {
+  document.getElementById('flag-1').textContent = currency1.flag;
+  document.getElementById('label-1').textContent = currency1.code;
+  document.getElementById('currency-btn-1').textContent = currency1.flag + ' ' + currency1.code + ' ▼';
+
+  document.getElementById('flag-2').textContent = currency2.flag;
+  document.getElementById('label-2').textContent = currency2.code;
+  document.getElementById('currency-btn-2').textContent = currency2.flag + ' ' + currency2.code + ' ▼';
+
+  document.getElementById('rate-label').textContent = '1 ' + currency2.code + ' = ? ' + currency1.code;
+}
+
+function getRate() {
+  const r = parseFloat(document.getElementById('rate-value').value);
+  return isNaN(r) || r <= 0 ? 0 : r;
+}
+
+function convertCurrency(source) {
+  lastEdited = source;
+  const rate = getRate();
+  const resultValue = document.getElementById('result-value');
+  const resultSub = document.getElementById('result-sub');
+
+  if (rate <= 0) {
+    resultValue.textContent = '—';
+    resultSub.textContent = 'Укажите курс больше нуля';
+    return;
+  }
+
+  if (source === 1) {
+    const val1 = parseFloat(document.getElementById('input-1').value);
+    if (isNaN(val1) || val1 === 0) {
+      document.getElementById('input-2').value = '';
+      resultValue.textContent = '0.00';
+      resultSub.textContent = 'Введите сумму в ' + currency1.code;
+      return;
+    }
+    const val2 = val1 / rate;
+    document.getElementById('input-2').value = val2.toFixed(2);
+    resultValue.textContent = val2.toFixed(2) + ' ' + currency2.code;
+    resultSub.textContent = val1.toFixed(2) + ' ' + currency1.code + ' ÷ ' + rate + ' = ' + val2.toFixed(2) + ' ' + currency2.code;
+  } else {
+    const val2 = parseFloat(document.getElementById('input-2').value);
+    if (isNaN(val2) || val2 === 0) {
+      document.getElementById('input-1').value = '';
+      resultValue.textContent = '0.00';
+      resultSub.textContent = 'Введите сумму в ' + currency2.code;
+      return;
+    }
+    const val1 = val2 * rate;
+    document.getElementById('input-1').value = val1.toFixed(2);
+    resultValue.textContent = val1.toFixed(2) + ' ' + currency1.code;
+    resultSub.textContent = val2.toFixed(2) + ' ' + currency2.code + ' × ' + rate + ' = ' + val1.toFixed(2) + ' ' + currency1.code;
+  }
+}
+
+function swapCurrencies() {
+  const tmp = currency1;
+  currency1 = currency2;
+  currency2 = tmp;
+  updateCurrencyUI();
+  const v1 = document.getElementById('input-1').value;
+  const v2 = document.getElementById('input-2').value;
+  document.getElementById('input-1').value = v2;
+  document.getElementById('input-2').value = v1;
+  convertCurrency(lastEdited === 1 ? 2 : 1);
+}
+
+function clearConverter() {
+  document.getElementById('input-1').value = '';
+  document.getElementById('input-2').value = '';
+  document.getElementById('result-value').textContent = '0.00';
+  document.getElementById('result-sub').textContent = 'Введите сумму';
+}
+
+// ============================================
+// УТИЛИТЫ
+// ============================================
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function(c) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+  });
+}
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ============================================
+// СТАРТ
+// ============================================
+window.addEventListener('load', function() {
+  try { checkAuth(); } catch(e) { console.error('checkAuth error:', e); }
+  try { renderRecentScans(); } catch(e) { console.error('renderRecent error:', e); }
+  try { updateCurrencyUI(); } catch(e) { console.error('updateCurrencyUI error:', e); }
+  try { convertCurrency(1); } catch(e) { console.error('convertCurrency error:', e); }
+  const rv = document.getElementById('rate-value');
+  if (rv) rv.addEventListener('input', function() { convertCurrency(lastEdited); });
+});
+</script>
+
+</body>
+</html>
