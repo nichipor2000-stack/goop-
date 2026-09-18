@@ -1561,6 +1561,7 @@ function loadTheme() {
   applyTheme(saved);
 }
   window.addEventListener('load', function() {
+  try { loadTheme(); } catch(e) { console.error(e); }
   try { checkAuth(); } catch(e) { console.error(e); }
   try { renderRecentScans(); } catch(e) { console.error(e); }
   try { updateCurrencyUI(); } catch(e) { console.error(e); }
