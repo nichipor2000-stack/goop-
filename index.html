@@ -770,7 +770,8 @@ function onScan(text, resultId, mode) {
       '<p><span class="label">Что в треке</span>' + escapeHtml(p.desc || '—') + '</p>' +
       '</div>';
     if (navigator.vibrate) navigator.vibrate(120);
-  } else {
+    } else {
+    playErrorSound();
     el.innerHTML = '<div class="card notfound">' +
       '<h3>❓ ' + escapeHtml(code) + '</h3>' +
       '<p>Такого трека нет в базе. Заполните и сохраните:</p>' +
