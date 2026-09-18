@@ -774,51 +774,127 @@ function savePackage() {
 // ==================== ПАКЕТНОЕ ====================
 let batchItems = [];
 
-function batchAddTrack() {
+function batchParseText() {
   const person = document.getElementById('batch-person').value.trim();
-  const track = document.getElementById('batch-track').value.trim().toUpperCase();
-  const weight = document.getElementById('batch-weight').value.trim();
-  const desc = document.getElementById('batch-desc').value.trim();
-  const count = document.getElementById('batch-count').value.trim();
-  if (!person) { alert('Введите имя получателя'); return; }
-  if (!track) { alert('Введите трек-номер'); return; }
-  batchItems.push({ person: person, track: track, weight: weight, desc: desc, count: count });
-  document.getElementById('batch-track').value = '';
-  document.getElementById('batch-weight').value = '';
-  document.getElementById('batch-desc').value = '';
-  document.getElementById('batch-count').value = '';
+  const textEl = document.getElementById('batch-text');
+  const text = textEl ? textEl.value.trim() : '';
+
+  if (!person) { alert('Сначала введите имя получателя'); return; }
+  if (!text) { alert('Введите хотя бы один трек в поле выше'); return; }
+
+  const lines = text.split('\n');
+  const parsed = [];
+  const errors = [];
+
+  lines.forEach(function(line, idx) {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    const parts = trimmed.split(/\s+/);
+
+    if (parts.length < 2) {
+      errors.push('Строка ' + (idx + 1) + ': слишком мало данных — «' + trimmed + '»');
+      return;
+    }
+
+    const track = parts[0].toUpperCase();
+    let count = '';
+    let weight = '';
+    let descParts = parts.slice(1);
+
+    const lastPart = descParts[descParts.length - 1];
+    const secondLast = descParts.length > 1 ? descParts[descParts.length - 2] : '';
+
+    const isLastNumber = /^\d+(\.\d+)?$/.test(lastPart);
+    const isSecondLastNumber = /^\d+(\.\d+)?$/.test(secondLast);
+
+    if (isLastNumber && isSecondLastNumber) {
+      count = lastPart;
+      weight = secondLast;
+      descParts = descParts.slice(0, -2);
+    } else if (isLastNumber) {
+      weight = lastPart;
+      descParts = descParts.slice(0, -1);
+    }
+
+    const desc = descParts.join(' ').trim();
+
+    parsed.push({
+      person: person,
+      track: track,
+      desc: desc,
+      weight: weight,
+      count: count
+    });
+  });
+
+  if (errors.length > 0) {
+    alert('Ошибки в строках:\n\n' + errors.join('\n'));
+  }
+
+  if (parsed.length === 0) {
+    alert('Не удалось разобрать ни одного трека. Проверьте формат.');
+    return;
+  }
+
+  batchItems = parsed;
   renderBatchPreview();
 }
 
 function renderBatchPreview() {
   const el = document.getElementById('batch-preview');
   const btn = document.getElementById('batch-save-btn');
-  if (batchItems.length === 0) { el.innerHTML = ''; btn.classList.add('hidden'); return; }
+  if (!el || !btn) return;
+
+  if (batchItems.length === 0) {
+    el.innerHTML = '';
+    btn.classList.add('hidden');
+    return;
+  }
+
   btn.classList.remove('hidden');
-  el.innerHTML = '<div class="card"><h3>📋 Готово к сохранению (' + batchItems.length + ')</h3>' +
+
+  el.innerHTML = '<div class="card"><h3>📋 Проверьте данные (' + batchItems.length + ' треков)</h3>' +
+    '<p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Если что-то неверно — исправьте текст выше и нажмите «Разобрать» снова.</p>' +
     batchItems.map(function(it, i) {
-      return '<p style="border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px;">' +
-        '<span class="track-number" style="display:inline-flex;min-width:24px;height:24px;font-size:11px;">' + (i + 1) + '</span> ' +
-        '<strong>' + escapeHtml(it.track) + '</strong> ' +
-        '<button class="danger" style="width:auto;padding:4px 10px;font-size:11px;margin-left:8px;display:inline-flex;" onclick="batchRemove(' + i + ')">×</button><br>' +
-        '<em style="font-size:12px;color:var(--text-secondary);">' + escapeHtml(it.person) + '</em> · ' + escapeHtml(it.weight || '—') + ' кг' +
-        '</p>';
+      return '<div style="border-bottom:1px solid var(--border);padding:10px 0;">' +
+        '<span class="track-number" style="display:inline-flex;min-width:24px;height:24px;font-size:11px;margin-right:6px;">' + (i + 1) + '</span> ' +
+        '<strong style="font-family:monospace;">' + escapeHtml(it.track) + '</strong><br>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">' +
+          '<em>' + escapeHtml(it.person) + '</em>' +
+          ' · ' + (it.desc ? escapeHtml(it.desc) : '<em>без описания</em>') +
+          ' · ' + (it.weight ? escapeHtml(it.weight) + ' кг' : '<em>вес ?</em>') +
+          ' · ' + (it.count ? escapeHtml(it.count) + ' шт' : '<em>кол-во ?</em>') +
+        '</span>' +
+        '</div>';
     }).join('') + '</div>';
 }
 
-function batchRemove(i) { batchItems.splice(i, 1); renderBatchPreview(); }
-
 function batchSaveAll() {
-  if (batchItems.length === 0) return;
+  if (batchItems.length === 0) { alert('Сначала разберите текст'); return; }
+
   const db = loadDB();
-    batchItems.forEach(function(it) {
-    db[it.track] = { person: it.person, weight: it.weight, desc: it.desc, count: it.count, addedAt: Date.now() };
+  let added = 0;
+
+  batchItems.forEach(function(it) {
+    db[it.track] = {
+      person: it.person,
+      weight: it.weight,
+      count: it.count,
+      desc: it.desc,
+      addedAt: Date.now()
+    };
+    added++;
   });
+
   saveDB(db);
-  alert('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
+  alert('✅ Сохранено ' + added + ' треков для ' + batchItems[0].person);
+
   batchItems = [];
   renderBatchPreview();
-  document.getElementById('batch-person').value = '';
+
+  const textEl = document.getElementById('batch-text');
+  if (textEl) textEl.value = '';
 }
 
 // ==================== ПОСЫЛКИ ====================
