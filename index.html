@@ -1347,9 +1347,15 @@ function renderPackages() {
     if (Object.keys(persons).length === 0) {
       personsEl.innerHTML = '';
     } else {
-      personsEl.innerHTML = Object.keys(persons).sort().map(function(name) {
+            personsEl.innerHTML = Object.keys(persons).sort().map(function(name) {
+        const avatar = getAvatarFor(name);
+        const color = getAvatarColor(name);
         return '<div class="card clickable" style="background:linear-gradient(to right,var(--primary-light),white);" onclick="openPersonDetail(\'' + escapeAttr(name) + '\')">' +
-          '<h3>👤 ' + escapeHtml(name) + ' <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">➜</span></h3>' +
+          '<h3>' +
+            '<span style="display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:' + color + ';font-size:22px;margin-right:6px;">' + avatar + '</span>' +
+            escapeHtml(name) +
+            ' <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">➜</span>' +
+          '</h3>' +
           '<p><span class="label">Треков</span>' + persons[name].count + '</p>' +
           '<p><span class="label">Общий вес</span>' + persons[name].weight.toFixed(1) + ' кг</p>' +
           '<p style="font-size:12px;color:var(--primary);margin-top:8px;">Нажмите для подробностей</p>' +
