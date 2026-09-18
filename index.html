@@ -792,7 +792,7 @@ function quickSave(track) {
   const weight = weightEl ? weightEl.value.trim() : '';
   const count = countEl ? countEl.value.trim() : '';
   const desc = descEl ? descEl.value.trim() : '';
-  if (!person) { alert('Введите имя: для кого этот трек'); return; }
+  if (!person) { showToast('Введите имя: для кого этот трек'); return; }
   try {
     const db = loadDB();
     db[track] = { person: person, weight: weight, count: count, desc: desc, addedAt: Date.now() };
