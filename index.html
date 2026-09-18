@@ -774,8 +774,8 @@ function batchRemove(i) { batchItems.splice(i, 1); renderBatchPreview(); }
 function batchSaveAll() {
   if (batchItems.length === 0) return;
   const db = loadDB();
-  batchItems.forEach(function(it) {
-    db[it.track] = { person: it.person, weight: it.weight, desc: it.desc, addedAt: Date.now() };
+    batchItems.forEach(function(it) {
+    db[it.track] = { person: it.person, weight: it.weight, desc: it.desc, count: it.count, addedAt: Date.now() };
   });
   saveDB(db);
   alert('✅ Сохранено ' + batchItems.length + ' треков для ' + batchItems[0].person);
