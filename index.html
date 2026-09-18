@@ -1474,6 +1474,86 @@ function openPersonDetail(name) {
   switchMenu('person-detail');
 }
 
+// ==================== РЕДАКТИРОВАНИЕ ТРЕКА ====================
+let editingOriginalPerson = '';
+
+function openEditModal(track) {
+  const db = loadDB();
+  const p = db[track];
+  if (!p) { alert('Трек не найден'); return; }
+
+  editingOriginalPerson = (p.person || '').trim();
+
+  document.getElementById('edit-track').value = track;
+  document.getElementById('edit-track-display').value = track;
+  document.getElementById('edit-person').value = p.person || '';
+  document.getElementById('edit-weight').value = p.weight || '';
+  document.getElementById('edit-count').value = p.count || '';
+  document.getElementById('edit-desc').value = p.desc || '';
+
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+function saveEditTrack() {
+  const track = document.getElementById('edit-track').value;
+  if (!track) return;
+
+  const person = document.getElementById('edit-person').value.trim();
+  const weight = document.getElementById('edit-weight').value.trim();
+  const count = document.getElementById('edit-count').value.trim();
+  const desc = document.getElementById('edit-desc').value.trim();
+
+  const db = loadDB();
+  db[track] = {
+    person: person,
+    weight: weight,
+    count: count,
+    desc: desc,
+    addedAt: db[track] ? db[track].addedAt : Date.now(),
+    editedAt: Date.now()
+  };
+  saveDB(db);
+
+  closeEditModal();
+  alert('✅ Трек обновлён');
+
+  // Обновляем текущий экран
+  if (document.getElementById('screen-person-detail') && !document.getElementById('screen-person-detail').classList.contains('hidden')) {
+    // Если сейчас открыты детали человека — переоткрываем (или возвращаемся)
+    if (person && person !== editingOriginalPerson) {
+      // Если имя изменилось — открываем новые детали
+      openPersonDetail(person);
+    } else {
+      openPersonDetail(editingOriginalPerson);
+    }
+  } else if (document.getElementById('screen-packages') && !document.getElementById('screen-packages').classList.contains('hidden')) {
+    renderPackages();
+  }
+}
+
+function deleteTrackFromModal() {
+  const track = document.getElementById('edit-track').value;
+  if (!track) return;
+  if (!confirm('Удалить трек ' + track + '?')) return;
+
+  const db = loadDB();
+  delete db[track];
+  saveDB(db);
+
+  closeEditModal();
+  alert('🗑 Трек удалён');
+
+  if (document.getElementById('screen-person-detail') && !document.getElementById('screen-person-detail').classList.contains('hidden')) {
+    // Возвращаемся на список посылок
+    switchMenu('packages');
+  } else {
+    renderPackages();
+  }
+}  
 // ==================== ГОЛОС ====================
 function startVoiceAdd() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
