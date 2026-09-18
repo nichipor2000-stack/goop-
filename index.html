@@ -906,8 +906,7 @@ function applyCrop() {
 
   canvas.toBlob(function(blob) {
     const newFile = new File([blob], 'cropped.png', { type: 'image/png' });
-    document.getElementById('crop-modal').style.display = 'none';
-
+    document.getElementById('crop-modal').classList.remove('active');
     // Отправляем в сканер
     processCroppedFile(newFile, cropState.targetId, cropState.event);
     cropState.img = null;
