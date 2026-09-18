@@ -944,7 +944,7 @@ function savePackage() {
   const weight = weightEl ? weightEl.value.trim() : '';
   const count = countEl ? countEl.value.trim() : '';
   const desc = descEl ? descEl.value.trim() : '';
-  if (!track) { alert('Введите трек-номер'); return; }
+  if (!track) { showToast('Введите трек-номер'); return; }
   try {
     const db = loadDB();
     db[track] = { person: person, weight: weight, count: count, desc: desc, addedAt: Date.now() };
