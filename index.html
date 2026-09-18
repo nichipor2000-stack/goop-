@@ -1207,7 +1207,7 @@ let editingOriginalPerson = '';
 function openEditModal(track) {
   const db = loadDB();
   const p = db[track];
-  if (!p) { alert('Трек не найден'); return; }
+  if (!p) { showToast('Трек не найден'); return; }
 
   editingOriginalPerson = (p.person || '').trim();
 
@@ -1243,7 +1243,7 @@ function saveEditTrack() {
   };
   saveDB(db);
   closeEditModal();
-  alert('✅ Трек обновлён');
+  showToast('✅ Трек обновлён');
 
   const personDetailScreen = document.getElementById('screen-person-detail');
   const packagesScreen = document.getElementById('screen-packages');
