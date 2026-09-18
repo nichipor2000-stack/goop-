@@ -665,30 +665,109 @@ function clearHistory() {
 function scanPhoto(event, targetId) {
   const file = event.target.files[0];
   if (!file) return;
+
   const statusEl = document.getElementById(targetId);
-  statusEl.innerHTML = '<div class="card info" style="margin-top:12px;">⏳ Распознаю...</div>';
+  statusEl.innerHTML = '<div class="card info" style="margin-top:12px;">⏳ Загружаю фото в высоком качестве...</div>';
+
   if (!document.getElementById('photo-temp')) {
     const div = document.createElement('div');
     div.id = 'photo-temp';
     div.style.display = 'none';
     document.body.appendChild(div);
   }
+
   const tempScanner = new Html5Qrcode("photo-temp");
-  tempScanner.scanFile(file, true)
-    .then(function(decodedText) {
-      const code = decodedText.toUpperCase();
-      document.getElementById('in-track').value = code;
-      statusEl.innerHTML = '<div class="card found" style="margin-top:12px;"><h3>✅ Распознано</h3><p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p></div>';
-      event.target.value = '';
-      tempScanner.clear();
-    })
-    .catch(function() {
-      statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;"><h3>❌ Не удалось</h3><p>Попробуйте другое фото.</p></div>';
-      event.target.value = '';
-      tempScanner.clear();
-    });
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(function(blob) {
+        const newFile = new File([blob], 'photo.png', { type: 'image/png' });
+
+        tempScanner.scanFile(newFile, false)
+          .then(function(decodedText) {
+            const code = decodedText.toUpperCase();
+            document.getElementById('in-track').value = code;
+            statusEl.innerHTML = '<div class="card found" style="margin-top:12px;">' +
+              '<h3>✅ Распознано</h3>' +
+              '<p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p>' +
+              '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Перейдите в «Добавить вручную» и заполните поля</p>' +
+              '</div>';
+            if (navigator.vibrate) navigator.vibrate(120);
+            event.target.value = '';
+            tempScanner.clear();
+          })
+          .catch(function() {
+            retryCenterCrop(canvas, tempScanner, statusEl, event);
+          });
+      }, 'image/png', 1.0);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
+function retryCenterCrop(canvas, tempScanner, statusEl, event) {
+  try {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cropW = Math.floor(w * 0.7);
+    const cropH = Math.floor(h * 0.7);
+    const cropX = Math.floor((w - cropW) / 2);
+    const cropY = Math.floor((h - cropH) / 2);
+
+    const cropCanvas = document.createElement('canvas');
+    cropCanvas.width = cropW;
+    cropCanvas.height = cropH;
+    const ctx = cropCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+    cropCanvas.toBlob(function(blob) {
+      const newFile = new File([blob], 'photo-crop.png', { type: 'image/png' });
+      tempScanner.scanFile(newFile, false)
+        .then(function(decodedText) {
+          const code = decodedText.toUpperCase();
+          document.getElementById('in-track').value = code;
+          statusEl.innerHTML = '<div class="card found" style="margin-top:12px;">' +
+            '<h3>✅ Распознано</h3>' +
+            '<p style="font-family:monospace;font-size:16px;font-weight:bold;">' + escapeHtml(code) + '</p>' +
+            '</div>';
+          if (navigator.vibrate) navigator.vibrate(120);
+          event.target.value = '';
+          tempScanner.clear();
+        })
+        .catch(function() {
+          statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;">' +
+            '<h3>❌ Не удалось распознать</h3>' +
+            '<p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Попробуйте:</p>' +
+            '<ul style="margin-top:6px;padding-left:20px;font-size:13px;color:var(--text-secondary);line-height:1.7;">' +
+            '<li>Сфотографировать <strong>ближе</strong> к штрих-коду</li>' +
+            '<li>Убрать блики и тени</li>' +
+            '<li>Держать телефон <strong>ровно</strong> параллельно этикетке</li>' +
+            '<li>Ввести трек-номер вручную на вкладке «Добавить вручную»</li>' +
+            '</ul>' +
+            '</div>';
+          event.target.value = '';
+          tempScanner.clear();
+        });
+    }, 'image/png', 1.0);
+  } catch (err) {
+    statusEl.innerHTML = '<div class="card notfound" style="margin-top:12px;"><h3>❌ Ошибка</h3><p>Попробуйте другое фото.</p></div>';
+    event.target.value = '';
+    tempScanner.clear();
+  }
+}
 // ==================== ШТРИХ-КОД ====================
 function generateBarcode() {
   const track = document.getElementById('in-track').value.trim().toUpperCase();
